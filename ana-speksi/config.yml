@@ -1,0 +1,21 @@
+# ana_speksi configuration
+# Adjust these settings to match your project.
+
+# When true, the AI agent skips all confirmation prompts during acceptance
+# and other interactive steps -- it still notifies you of every action.
+auto_confirm: true
+
+# When true, the AI agent automatically continues to the next story during
+# the codify phase without asking for confirmation between stories.
+auto_story_implementation_continue: true
+
+# Project context injected into all skill instructions.
+# Helps the AI understand your project's conventions.
+context: |
+  # Add your project context here.
+  # Tech stack, conventions, constraints, etc.
+
+# Per-phase rules (optional)
+rules:
+  proporal:
+    - "Include verbatim the proposal from github issue"
