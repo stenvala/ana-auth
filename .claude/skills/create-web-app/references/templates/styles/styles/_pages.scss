@@ -1,0 +1,387 @@
+// ============================================================================
+// PAGE LAYOUT STYLES
+// Common styles for route/page components
+// ============================================================================
+
+// Page container - standard padding and max-width
+.page-container {
+  margin: 0 auto;
+
+  &--narrow {
+    max-width: 800px;
+  }
+
+  &--wide {
+    max-width: 1800px;
+  }
+
+  &--with-margin {
+    margin: var(--spacing-md);
+  }
+
+  // Full-screen page layout (no scroll on container, panels scroll independently)
+  &--fullscreen {
+    padding: 0;
+    max-width: none;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  // Scrollable container that fills available height
+  &--scrollable {
+    height: 100vh;
+    overflow-y: scroll;
+    padding: var(--spacing-lg);
+    box-sizing: border-box;
+    background: var(--color-bg-page);
+  }
+
+  // Container for pages without navbar (uses full viewport height)
+  &--without-nav-bar {
+    min-height: 100vh;
+  }
+}
+
+// Page header with title and actions
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfeff 100%);
+  border-bottom: 1px solid rgba(63, 169, 129, 0.15);
+  min-height: 52px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+
+  h1 {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--color-text-primary);
+    letter-spacing: -0.3px;
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  &__info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex-shrink: 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      white-space: nowrap;
+
+      .info-label {
+        font-size: var(--font-size-xs);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        opacity: 0.7;
+      }
+
+      .info-value {
+        font-weight: 600;
+        color: var(--color-text-primary);
+      }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: var(--spacing-xs);
+    flex-shrink: 0;
+  }
+}
+
+// Resizable footer panel (collapsible)
+.panel-footer {
+  background: var(--color-bg-card);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  min-height: 30px;
+
+  &.collapsed {
+    height: 30px !important;
+    min-height: 30px;
+    max-height: 30px;
+  }
+
+  &__resize-handle {
+    height: 6px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    cursor: row-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &:hover {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfeff 100%);
+    }
+
+    .resize-grip {
+      width: 40px;
+      height: 3px;
+      background: rgba(63, 169, 129, 0.3);
+      border-radius: 2px;
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    min-height: 30px;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    color: var(--color-text-primary);
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      color: var(--color-primary);
+    }
+  }
+
+  &__actions {
+    margin-left: auto;
+    display: flex;
+    gap: var(--spacing-xs);
+  }
+
+  &__content {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+
+    &.collapsed {
+      display: none;
+    }
+  }
+}
+
+// Panel with sidebar improvements
+.panel-with-sidebar {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  &__sidebar {
+    width: 140px;
+    flex-shrink: 0;
+    padding: var(--spacing-sm);
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-right: 1px solid rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    overflow-y: auto;
+    box-shadow: inset -1px 0 3px rgba(0, 0, 0, 0.02);
+  }
+
+  &__main {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: auto;
+    min-width: 0;
+    background: #ffffff;
+  }
+}
+
+// Filter card
+.filter-card {
+  margin: var(--spacing-xl);
+  border: 1px solid rgba(63, 169, 129, 0.15);
+  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fdfb 100%);
+}
+
+// Page info text
+.page-info {
+  margin: 0 0 var(--spacing-xl);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+// Filter form with responsive layout
+.filter-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+
+  mat-form-field {
+    flex: 1;
+    min-width: 200px;
+  }
+}
+
+// Loading state centered
+.loading-state {
+  display: flex;
+  justify-content: center;
+  padding: 48px;
+}
+
+// Content grid (sidebar + main)
+.content-grid {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: var(--spacing-xl);
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+
+  &--reverse {
+    grid-template-columns: 1fr 400px;
+  }
+}
+
+// Info grid for detail views
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    &--full {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .info-label {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+
+  .info-value {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+    font-weight: 500;
+  }
+
+  // Compact variant
+  &--compact {
+    gap: var(--spacing-xs) var(--spacing-sm);
+
+    .info-item {
+      gap: 2px;
+    }
+
+    .info-label {
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    .info-value {
+      font-size: var(--font-size-sm);
+    }
+  }
+}
+
+// Edit form layout
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+  }
+
+  // Compact grid variant
+  &--grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-xs) var(--spacing-sm);
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--spacing-xs);
+    }
+  }
+}
+
+// Section spacing
+.details-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+// ============================================================================
+// SCROLLABLE AREA
+// Use inside page-container to make content below header scrollable
+// ============================================================================
+
+.scrollable-area {
+  flex: 1;
+  overflow-y: scroll;
+  min-height: 0;
+
+  // Standard pages with header and navbar (no padding, content handles its own)
+  &--with-header-and-nav {
+    height: calc(100vh - 52px - 53px);
+  }
+
+  // Bottom padding for scrollable content - uses pseudo-element because
+  // padding-bottom on overflow:scroll containers gets collapsed
+  &::after {
+    content: '';
+    display: block;
+    height: 50px;
+  }
+}

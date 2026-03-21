@@ -1,0 +1,6 @@
+<div class="shared-loading-state">
+  <mat-spinner [diameter]="size()" />
+  @if (message()) {
+    <p class="shared-loading-state__message">{{ message() }}</p>
+  }
+</div>

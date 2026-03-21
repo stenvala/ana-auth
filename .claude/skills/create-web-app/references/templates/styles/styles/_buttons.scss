@@ -1,0 +1,62 @@
+// ============================================================================
+// BUTTON STYLES
+// ============================================================================
+
+.btn-submit {
+  height: 48px;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  margin-top: var(--spacing-sm);
+
+  mat-spinner {
+    margin: 0 auto;
+  }
+}
+
+// ============================================================================
+// LOADING BUTTON DIRECTIVE STYLES
+// ============================================================================
+
+// Spinning animation for mat-icon during loading
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.mat-mdc-button.only-icon > .mat-icon {
+  margin-right: 0px !important;
+  margin-left: 0px !important;
+}
+
+.mat-mdc-button.only-icon {
+  padding: 0px !important;
+  min-width: 32px;
+}
+
+// Applied by sharedLoadingButton directive during async operations
+mat-icon.spinning {
+  animation: spin 1s linear infinite;
+}
+
+// Button loading state
+button.loading {
+  cursor: wait;
+  opacity: 0.8;
+}
+
+// Button confirming state (click-again-to-confirm pattern)
+button.confirming {
+  background-color: var(--mat-sys-error) !important;
+  color: var(--mat-sys-on-error) !important;
+}
+
+// Destructive action button (delete, discard)
+button.btn-destructive {
+  background-color: var(--mat-sys-error) !important;
+  color: var(--mat-sys-on-error) !important;
+}

@@ -1,0 +1,54 @@
+// ============================================================================
+// FORM STYLES
+// ============================================================================
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+// Full width form field utility
+.full-width {
+  width: 100%;
+}
+
+// Reduced width container for forms
+.reduced-width {
+  max-width: 800px;
+}
+
+// Dialog subtitle text
+.dialog-subtitle {
+  margin: 0 0 16px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// Form actions container - left-aligned by default
+.form-actions {
+  margin-top: var(--spacing-lg);
+}
+
+// Form hint text
+.form-hint {
+  color: var(--mat-sys-on-surface-variant);
+  margin-bottom: var(--spacing-md);
+}
+
+// Form section with title
+.form-section {
+  margin-bottom: var(--spacing-xl);
+
+  h3 {
+    margin: 0 0 var(--spacing-md) 0;
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    color: var(--mat-sys-on-surface);
+  }
+}
+
+// Toggle field block display
+.toggle-field {
+  display: block;
+  margin-bottom: var(--spacing-lg);
+}

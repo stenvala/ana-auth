@@ -1,0 +1,29 @@
+agent: claude
+skills:
+  backend-logger: true
+  backend-router: true
+  backend-service: true
+  backend-worker: true
+  code-simplifier: true
+  commit: true
+  create-web-app: true
+  database-design: true
+  database-model: true
+  database-repository: true
+  database-schema-edit-postgres: true
+  database-schema-edit-sqlite: true
+  database-setup-postgres: true
+  database-setup-sqlite: true
+  frontend-component: true
+  frontend-dialog: true
+  frontend-forms: true
+  frontend-service: true
+  frontend-store: true
+  mcc-ci-cd: true
+  mcc-infra: true
+  mcc-pipeline: true
+  python-coding-conventions: true
+  skill-creator: true
+  test-playwright: true
+  test-python-integration: true
+  test-python-unit: true

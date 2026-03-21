@@ -1,0 +1,30 @@
+// ============================================================================
+// BASE STYLES
+// ============================================================================
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  color-scheme: light;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.margin-md {
+  margin: var(--spacing-md);
+}
+
+.padding-md {
+  padding: var(--spacing-md);
+}
+
+.gap {
+  display: flex;
+  gap: 1rem;
+}

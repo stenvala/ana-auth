@@ -1,0 +1,29 @@
+<mat-toolbar class="app-toolbar" data-test-id="navbar">
+  <a [routerLink]="paths.AUTH.DASHBOARD" class="logo" data-test-id="navbar-title">
+    <span class="logo-text">App</span>
+  </a>
+
+  <span class="spacer"></span>
+
+  @if (isAuthenticated()) {
+    <!-- Desktop navigation -->
+    <nav class="nav-links desktop-nav" data-test-id="desktop-nav">
+      <!-- Add navigation links with routerLinkActive="active-link" -->
+      <button matButton class="only-icon btn-logout" (click)="logout()" matTooltip="Logout" data-test-id="logout-btn">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </nav>
+
+    <!-- Mobile menu button -->
+    <button matButton class="mobile-menu-button only-icon" [matMenuTriggerFor]="mobileMenu" data-test-id="mobile-menu-btn">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <mat-menu #mobileMenu="matMenu">
+      <!-- Add mobile menu items -->
+      <button mat-menu-item (click)="logout()" data-test-id="mobile-logout-btn">
+        <mat-icon>logout</mat-icon>
+        <span>Logout</span>
+      </button>
+    </mat-menu>
+  }
+</mat-toolbar>

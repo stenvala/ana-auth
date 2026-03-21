@@ -1,0 +1,307 @@
+// ============================================================================
+// MATERIAL OVERRIDES
+// ============================================================================
+
+// Banner (mat-toolbar used as page banner/header)
+mat-toolbar[role='banner'] {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfeff 100%) !important;
+  border-bottom: 1px solid rgba(63, 169, 129, 0.15);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+
+  h1 {
+    color: var(--color-text-primary) !important;
+    font-weight: 600 !important;
+  }
+}
+
+// Card improvements
+mat-card {
+  box-shadow: var(--shadow-md) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  background: #ffffff !important;
+  border-radius: var(--radius-md) !important;
+}
+
+// Form field styling improvements
+.mat-mdc-form-field {
+  .mat-mdc-text-field-wrapper {
+    background-color: #fafbfc !important;
+    border-radius: var(--radius-sm) !important;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #ffffff !important;
+    }
+  }
+
+  &.mat-focused {
+    .mat-mdc-text-field-wrapper {
+      background-color: #ffffff !important;
+      border-color: var(--color-primary);
+    }
+  }
+}
+
+// Form card styling
+.form-card,
+.form {
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+
+  .mat-mdc-text-field-wrapper {
+    border-radius: var(--radius-sm);
+  }
+
+  .mat-mdc-form-field-flex {
+    align-items: center;
+  }
+
+  .mat-mdc-form-field-icon-prefix {
+    padding-right: var(--spacing-sm);
+    color: var(--color-text-secondary);
+  }
+}
+
+// ============================================================================
+// MATERIAL BUTTON OVERRIDES
+// ============================================================================
+
+// Filled buttons (primary actions)
+button[matButton='filled'] {
+  background: var(--gradient-primary) !important;
+  color: white !important;
+  font-weight: 500 !important;
+  box-shadow: 0 2px 4px rgba(63, 169, 129, 0.3) !important;
+  transition: all var(--transition-fast) !important;
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 4px 8px rgba(63, 169, 129, 0.4) !important;
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+// Outlined buttons (secondary actions)
+button[matButton='outlined'] {
+  border-color: var(--color-primary) !important;
+  color: var(--color-primary) !important;
+  font-weight: 500 !important;
+  transition: all var(--transition-fast) !important;
+
+  &:hover:not(:disabled) {
+    background-color: rgba(63, 169, 129, 0.08) !important;
+    border-color: var(--color-primary-dark) !important;
+  }
+}
+
+// Tonal buttons
+button[matButton='tonal'] {
+  background-color: rgba(63, 169, 129, 0.12) !important;
+  color: var(--color-primary-dark) !important;
+  font-weight: 500 !important;
+  transition: all var(--transition-fast) !important;
+
+  &:hover:not(:disabled) {
+    background-color: rgba(63, 169, 129, 0.2) !important;
+  }
+}
+
+// ============================================================================
+// MATERIAL CHIP OVERRIDES - Unified Badge Styling
+// ============================================================================
+
+.mat-mdc-chip {
+  --mdc-chip-container-height: 28px;
+  font-size: var(--font-size-xs) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.3px !important;
+  border-radius: var(--radius-pill) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid transparent !important;
+
+  .mdc-evolution-chip__text-label {
+    font-size: var(--font-size-xs) !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.3px !important;
+  }
+}
+
+// Success/Active state chips (green)
+.mat-mdc-chip.mat-primary,
+.mat-mdc-chip[class*='success'],
+.mat-mdc-chip[class*='active'] {
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important;
+  color: #047857 !important;
+  border-color: #a7f3d0 !important;
+}
+
+// Error/Inactive state chips (gray)
+.mat-mdc-chip.mat-accent,
+.mat-mdc-chip[class*='inactive'],
+.mat-mdc-chip[class*='closed'] {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+  color: #475569 !important;
+  border-color: #cbd5e1 !important;
+}
+
+// Warning state chips (amber)
+.mat-mdc-chip.mat-warn,
+.mat-mdc-chip[class*='warning'] {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%) !important;
+  color: #b45309 !important;
+  border-color: #fde68a !important;
+}
+
+// Info/Default chips (blue)
+.mat-mdc-chip[class*='info'],
+.mat-mdc-chip[class*='default'] {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%) !important;
+  color: #1d4ed8 !important;
+  border-color: #bfdbfe !important;
+}
+
+// ============================================================================
+// MATERIAL TABLE OVERRIDES
+// ============================================================================
+
+.mat-mdc-table {
+  background: transparent !important;
+
+  .mat-mdc-header-row {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+
+    .mat-mdc-header-cell {
+      font-weight: 600 !important;
+      color: var(--color-text-primary) !important;
+      font-size: var(--font-size-sm) !important;
+      border-bottom: 2px solid rgba(63, 169, 129, 0.2) !important;
+    }
+  }
+
+  .mat-mdc-row {
+    transition: background-color var(--transition-fast);
+
+    &:hover {
+      background-color: rgba(63, 169, 129, 0.04) !important;
+    }
+
+    &.clickable-row {
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba(63, 169, 129, 0.08) !important;
+      }
+    }
+
+    .mat-mdc-cell {
+      color: var(--color-text-primary) !important;
+      border-bottom-color: rgba(0, 0, 0, 0.06) !important;
+    }
+  }
+}
+
+// ============================================================================
+// MATERIAL TAB OVERRIDES
+// ============================================================================
+
+.mat-mdc-tab-group {
+  .mat-mdc-tab-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  .mat-mdc-tab {
+    font-weight: 500 !important;
+
+    &.mdc-tab--active {
+      .mdc-tab__text-label {
+        color: var(--color-primary) !important;
+      }
+    }
+  }
+
+  .mat-mdc-tab-header-pagination-chevron {
+    border-color: var(--color-primary) !important;
+  }
+
+  .mdc-tab-indicator__content--underline {
+    border-color: var(--color-primary) !important;
+  }
+}
+
+// ============================================================================
+// MATERIAL MENU OVERRIDES
+// ============================================================================
+
+.mat-mdc-menu-panel {
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+.mat-mdc-menu-item {
+  font-weight: 500 !important;
+
+  &:hover:not(:disabled) {
+    background-color: rgba(63, 169, 129, 0.08) !important;
+  }
+
+  mat-icon {
+    color: var(--color-text-secondary) !important;
+  }
+
+  &.delete-action {
+    color: var(--color-error-text) !important;
+
+    mat-icon {
+      color: var(--color-error-text) !important;
+    }
+
+    &:hover:not(:disabled) {
+      background-color: rgba(220, 38, 38, 0.08) !important;
+    }
+  }
+}
+
+// ============================================================================
+// MATERIAL DIALOG OVERRIDES
+// ============================================================================
+
+.mat-mdc-dialog-container {
+  .mdc-dialog__surface {
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-xl) !important;
+  }
+}
+
+.mat-mdc-dialog-title {
+  font-weight: 600 !important;
+  color: var(--color-text-primary) !important;
+}
+
+// ============================================================================
+// MATERIAL SELECT OVERRIDES
+// ============================================================================
+
+.mat-mdc-select-panel {
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+.mat-mdc-option {
+  &:hover:not(.mat-mdc-option-disabled) {
+    background-color: rgba(63, 169, 129, 0.08) !important;
+  }
+
+  &.mat-mdc-option-active {
+    background-color: rgba(63, 169, 129, 0.12) !important;
+  }
+
+  &.mdc-list-item--selected {
+    background-color: rgba(63, 169, 129, 0.15) !important;
+  }
+}

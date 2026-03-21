@@ -1,0 +1,22 @@
+[Unit]
+Description=Accounts API Service
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory={{API_SYMLINK}}
+Environment="ENV_TYPE=production"
+Environment="LOG_ROOT={{REMOTE_BASE}}/logs"
+ExecStart={{REMOTE_BASE}}/.venv/bin/gunicorn api.main:app \
+    --workers 4 \
+    --worker-class uvicorn.workers.UvicornWorker \
+    --bind 127.0.0.1:{{API_PORT}} \
+    --access-logfile - \
+    --error-logfile -
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

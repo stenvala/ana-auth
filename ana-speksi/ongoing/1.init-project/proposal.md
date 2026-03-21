@@ -51,28 +51,29 @@ The developer needs a private SSO/OAuth authentication service (ana-auth) to pro
 
 - FR1: README.md documents the project purpose (private SSO/OAuth service), planned features (user management, SSO sign-in, JWT tokens, token refresh, user info endpoint), technology stack (Python 3.13, Angular 21, PostgreSQL), and domains (auth.mathcodingclub.com, auth-dev.mathcodingclub.com)
 - FR2: Backend skeleton runs with a health check endpoint responding successfully; all commands use `uv run`
-- FR3: Frontend skeleton builds and serves a landing page
-- FR4: Database setup script (typer CLI) supports multitenant schemas via suffix: create, drop, and related commands -- each creating/managing a PostgreSQL schema like `ana-auth-{suffix}`
+- FR3: Frontend skeleton builds and serves a landing page with Angular Material v3 custom sci-fi theme (dark mode default, deep violet primary, electric cyan tertiary)
+- FR4: Database setup script (typer CLI) supports multitenant schemas via suffix: create, drop, update (migrations), and related commands -- each creating/managing a PostgreSQL schema like `ana-auth-{suffix}`
 - FR5: Initial user schema SQL defines tables for user accounts (id, user_name, password_hash, given_name, family_name, display_name, email, created_at, updated_at)
 - FR6: Master admin user creation via idempotent SQL script (INSERT ... ON CONFLICT DO NOTHING pattern), run as part of schema setup and during deployment
 - FR7: `run_tests.py` orchestrates three test levels via typer CLI:
   - `quality`: ruff linting, ruff import sorting, ty type checking, ruff cyclomatic complexity check (C901 limit 10, fails build if exceeded)
-  - `python`: unit and integration tests with pytest, parallel execution (`-n auto`, each worker gets its own schema), coverage reporting (90% minimum threshold, fails build if not reached)
-  - `e2e`: E2E tests with a fixed `ana-auth-e2e` schema, reset before run
+  - `unit`: unit tests with pytest (mocked dependencies, no DB), parallel (`-n auto`), 90% coverage threshold (fails build if not reached)
+  - `integration`: integration tests with real PostgreSQL (each worker gets its own schema), parallel (`-n auto`), coverage reported but no enforced threshold
+  - `e2e`: E2E tests with Playwright (Python), each worker gets its own isolated schema
   - `all`: runs all of the above
 - FR8: Test conftest.py fixtures provide:
   - Session-scoped schema creation with UUID suffix and automatic teardown for unit/integration tests
   - Function-scoped database sessions for transaction isolation
   - Integration test client with X-Schema header injection
   - Pre-computed bcrypt test password hash for fast test execution
-- FR9: `mcc_build.py` runs quality checks and unit/integration tests (with `--no-tests` escape hatch), then builds frontend and backend, packages for deployment
-- FR10: `mcc_deploy.py` deploys the application, creates the database schema if it doesn't exist, ensures master admin user exists, and deploys cron jobs for prod stage. Connects to remote PostgreSQL directly on LAN (192.168.0.x:5432)
+- FR9: `mcc_build.py` runs quality checks, unit tests (with 90% coverage gate), and integration tests (with `--no-tests` escape hatch), then builds frontend and backend, packages for deployment
+- FR10: `mcc_deploy.py` deploys the application, creates the database schema if it doesn't exist, runs pending migrations, ensures master admin user exists, and deploys cron jobs for prod stage. Connects to remote PostgreSQL directly on LAN (192.168.0.x:5432). Includes a clone-prod-to-dev non-deployment stage
 - FR11: Schema versioning via SQL file checksum and deployment log table to prevent redundant deployments
 - FR12: Infrastructure configuration supports two stages on the same server: auth-dev.mathcodingclub.com (dev) and auth.mathcodingclub.com (prod) with separate systemd services, nginx configs, and SSL certificates
   - Prod deploys to `live/auth/`, dev deploys to `live/auth-dev/`
 - FR13: MCC scripts follow the patterns from the sibling events.3rdb.com project (mcc_build.py, mcc_deploy.py, mcc_common.py, mcc_config.py, lint.py, run_tests.py, start_services.py, mcc/deploy_server.py)
 - FR14: Local development uses Docker for PostgreSQL (docker-compose.yml with postgres service on localhost:5432) -- no special local initialization script needed
-- FR15: Stage-specific configuration via YAML files (conf-dev.yml, conf-main.yml) with database host, port, schema suffix, and other deployment parameters
+- FR15: Stage-specific configuration via YAML files (conf-dev.yml, conf-prod.yml) with database host, port, schema suffix, and other deployment parameters
 - FR16: Database backup script using pg_dump piped through gzip, producing daily compressed backups
 - FR17: Backup retention policy: keep last 30 daily backups + last day of each month for 12 months
 - FR18: Backup cron job deployed only for prod stage, runs daily, stores backups at `live/auth/backup/`
@@ -81,13 +82,13 @@ The developer needs a private SSO/OAuth authentication service (ana-auth) to pro
 ## Success Criteria
 
 - SC1: `uv run pytest` passes on the backend skeleton
-- SC2: `ng build` succeeds on the frontend skeleton
+- SC2: `npx ng build` succeeds on the frontend skeleton
 - SC3: `uv run mcc_build.py` completes successfully (quality + tests + build)
 - SC4: README.md clearly describes the project vision, stack, and planned features
 - SC5: Database setup script can create and drop schemas with `uv run db_setup.py create main` and `uv run db_setup.py drop main --confirm`
 - SC6: Schema creation includes user account tables and master admin user
 - SC7: `uv run run_tests.py quality` passes ruff, ty, and complexity checks (C901 limit 10)
-- SC8: `uv run run_tests.py python --coverage` passes with 90% minimum coverage
+- SC8: `uv run run_tests.py unit --coverage` passes with 90% minimum coverage; `uv run run_tests.py integration` passes
 - SC9: The application can be deployed to both auth-dev.mathcodingclub.com and auth.mathcodingclub.com from the same server
 - SC10: Prod deployment installs backup cron job; backup script produces compressed schema dump
 
@@ -106,7 +107,7 @@ The developer needs a private SSO/OAuth authentication service (ana-auth) to pro
 ## Assumptions
 
 - Python 3.13 and uv are available in the development environment
-- Angular 21 CLI is available (user confirms it has been published)
+- Angular 21 CLI is available (user confirms it has been published); requires Node.js 20.19 via nvm
 - PostgreSQL runs in Docker locally for development (localhost:5432, postgres/postgres) and is always available
 - Production PostgreSQL is on the same LAN as the deployment server (192.168.0.x:5432, direct connection)
 - pg_dump is available on the production server for backup scripts

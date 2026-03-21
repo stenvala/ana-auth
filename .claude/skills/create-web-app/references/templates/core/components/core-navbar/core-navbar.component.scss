@@ -1,0 +1,73 @@
+$mobile-breakpoint: 900px;
+
+.app-toolbar {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  text-decoration: none;
+  color: inherit;
+
+  .logo-text {
+    font-size: 18px;
+    letter-spacing: 0.5px;
+  }
+}
+
+.nav-links {
+  display: flex;
+  margin-left: 24px;
+
+  a,
+  .admin-button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &.active {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+}
+
+.spacer {
+  flex: 1;
+}
+
+.user-name {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Responsive behavior
+.mobile-menu-button {
+  display: none;
+}
+
+@media (max-width: $mobile-breakpoint) {
+  .desktop-nav {
+    display: none;
+  }
+
+  .mobile-menu-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .user-name {
+    display: none;
+  }
+}

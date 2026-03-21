@@ -1,0 +1,15 @@
+<mat-form-field appearance="outline" class="shared-search-input">
+  <mat-icon matPrefix>search</mat-icon>
+  <input
+    matInput
+    type="text"
+    [placeholder]="placeholder()"
+    [ngModel]="value()"
+    (ngModelChange)="onInput($event)"
+  />
+  @if (value()) {
+    <button matSuffix matButton class="only-icon" (click)="clear()">
+      <mat-icon>close</mat-icon>
+    </button>
+  }
+</mat-form-field>

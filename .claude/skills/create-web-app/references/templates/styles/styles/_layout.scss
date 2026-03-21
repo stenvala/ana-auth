@@ -1,0 +1,88 @@
+// ============================================================================
+// LAYOUT UTILITIES
+// ============================================================================
+
+// Full page centered container (for standalone forms/cards)
+.page-centered {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gradient-primary);
+  padding: var(--spacing-md);
+}
+
+// Full page with toolbar layout
+.page-with-toolbar {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-page);
+}
+
+// Content wrapper with max-width
+.content-wrapper {
+  flex: 1;
+  padding: var(--spacing-xl);
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+// Flex utilities
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
+.flex-1 {
+  flex: 1;
+}
+.items-center {
+  align-items: center;
+}
+.justify-center {
+  justify-content: center;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.gap-xs {
+  gap: var(--spacing-xs);
+}
+.gap-sm {
+  gap: var(--spacing-sm);
+}
+.gap-md {
+  gap: var(--spacing-md);
+}
+.gap-lg {
+  gap: var(--spacing-lg);
+}
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+// Spacing
+.spacer {
+  flex: 1;
+}
+.mb-sm {
+  margin-bottom: var(--spacing-sm);
+}
+.mb-md {
+  margin-bottom: var(--spacing-md);
+}
+.mb-lg {
+  margin-bottom: var(--spacing-lg);
+}
+.mb-xl {
+  margin-bottom: var(--spacing-xl);
+}
+
+// Width utilities
+.full-width {
+  width: 100%;
+}

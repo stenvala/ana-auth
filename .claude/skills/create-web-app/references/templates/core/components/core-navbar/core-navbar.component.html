@@ -1,0 +1,21 @@
+<mat-toolbar class="app-toolbar" color="primary">
+  <a [routerLink]="paths.AUTH.DASHBOARD" class="logo">
+    <!-- TODO: Add logo -->
+    <span class="logo-text">App</span>
+  </a>
+
+  <!-- Desktop navigation -->
+  <nav class="nav-links desktop-nav">
+    <!-- TODO: Add navigation links -->
+  </nav>
+
+  <span class="spacer"></span>
+
+  <!-- Mobile menu button -->
+  <button matButton class="mobile-menu-button" [matMenuTriggerFor]="mobileMenu">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <mat-menu #mobileMenu="matMenu">
+    <!-- TODO: Add mobile menu items -->
+  </mat-menu>
+</mat-toolbar>

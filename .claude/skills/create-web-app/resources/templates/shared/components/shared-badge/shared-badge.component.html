@@ -1,0 +1,6 @@
+<span [class]="badgeClasses()">
+  @if (showDot() || customColor()) {
+    <span class="workflow-dot" [style.background-color]="customColor()"></span>
+  }
+  {{ value() }}
+</span>

@@ -1,0 +1,22 @@
+<h2 mat-dialog-title>{{ data.title }}</h2>
+
+<mat-dialog-content>
+  <p>{{ data.message }}</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button matButton="outlined" type="button" (click)="onCancel()" data-t-id="dialog-cancel">
+    <mat-icon>close</mat-icon>
+    {{ data.cancelText || 'Peruuta' }}
+  </button>
+  <button
+    matButton="filled"
+    type="button"
+    [class.btn-destructive]="data.confirmColor === 'warn'"
+    (click)="onConfirm()"
+    data-t-id="dialog-confirm"
+  >
+    <mat-icon>{{ data.confirmColor === 'warn' ? 'delete' : 'check' }}</mat-icon>
+    {{ data.confirmText || 'Vahvista' }}
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,179 @@
+// ============================================================================
+// CARD STYLES
+// ============================================================================
+
+// Form card - centered form container (login, register, settings forms, etc.)
+.form-card {
+  width: 100%;
+  max-width: var(--max-width-form-sm);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--color-bg-card);
+
+  &--md {
+    max-width: var(--max-width-form-md);
+  }
+
+  &--lg {
+    max-width: var(--max-width-form-lg);
+  }
+
+  mat-card-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: var(--spacing-xl);
+    padding: 0;
+
+    mat-card-title {
+      font-size: var(--font-size-3xl);
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    mat-card-subtitle {
+      font-size: var(--font-size-base);
+      color: var(--color-text-secondary);
+      text-align: center;
+    }
+  }
+
+  mat-card-content {
+    padding: 0;
+  }
+}
+
+// Feature card - dashboard/overview cards with hover effect
+.feature-card {
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(63, 169, 129, 0.12);
+  background: linear-gradient(to bottom, #ffffff 0%, #f8fdfb 100%);
+  box-shadow: var(--shadow-md);
+  transition:
+    transform var(--transition-normal),
+    box-shadow var(--transition-normal),
+    border-color var(--transition-normal);
+  cursor: pointer;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-primary);
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card-hover);
+    border-color: rgba(63, 169, 129, 0.3);
+
+    &::before {
+      opacity: 1;
+    }
+
+    mat-icon[mat-card-avatar] {
+      transform: scale(1.1);
+    }
+  }
+
+  mat-card-header {
+    padding-bottom: var(--spacing-md);
+  }
+
+  mat-icon[mat-card-avatar] {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background: var(--gradient-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 4px 8px rgba(63, 169, 129, 0.25);
+    transition: transform var(--transition-normal);
+  }
+
+  mat-card-title {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  mat-card-subtitle {
+    color: var(--color-text-muted);
+  }
+
+  mat-card-content p {
+    color: var(--color-text-secondary);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  mat-card-actions {
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
+}
+
+// Card icon (avatar style)
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--gradient-primary);
+  color: var(--color-text-on-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xl);
+  box-shadow: 0 4px 8px rgba(63, 169, 129, 0.25);
+}
+
+// Cards grid layout
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+// Compact card variant for dense layouts
+.card-compact {
+  mat-card-header {
+    padding: var(--spacing-xs) var(--spacing-sm);
+
+    mat-card-title {
+      font-size: var(--font-size-sm);
+      margin: 0;
+    }
+  }
+
+  mat-card-content {
+    padding: var(--spacing-sm);
+  }
+}
+
+// Panel card - for sections like permissions display
+.panel {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+
+  h3 {
+    margin: 0 0 var(--spacing-md) 0;
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+}

@@ -1,0 +1,71 @@
+// ============================================================================
+// RESIZE HANDLES - Unified styles for resizable panel dividers
+// ============================================================================
+
+// Horizontal resize handle (for vertical dividers - col-resize)
+.resize-handle-horizontal {
+  flex-shrink: 0;
+  width: 8px;
+  background: var(--mat-sys-surface-container);
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: var(--mat-sys-surface-container-high);
+  }
+
+  &:active {
+    background: var(--color-success-bg);
+  }
+}
+
+// Vertical resize handle (for horizontal dividers - row-resize)
+.resize-handle-vertical {
+  flex-shrink: 0;
+  height: 8px;
+  background: var(--mat-sys-surface-container);
+  cursor: row-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: var(--mat-sys-surface-container-high);
+  }
+
+  &:active {
+    background: var(--color-success-bg);
+  }
+}
+
+// Resize handle grip indicator - vertical orientation (for horizontal resize)
+.resize-handle-grip-vertical {
+  width: 4px;
+  height: 48px;
+  background: var(--mat-sys-outline-variant);
+  border-radius: 2px;
+  transition: background-color 0.15s ease;
+
+  .resize-handle-horizontal:hover &,
+  .resize-handle-horizontal:active & {
+    background: var(--mat-sys-primary);
+  }
+}
+
+// Resize handle grip indicator - horizontal orientation (for vertical resize)
+.resize-handle-grip-horizontal {
+  width: 48px;
+  height: 4px;
+  background: var(--mat-sys-outline-variant);
+  border-radius: 2px;
+  transition: background-color 0.15s ease;
+
+  .resize-handle-vertical:hover &,
+  .resize-handle-vertical:active & {
+    background: var(--mat-sys-primary);
+  }
+}

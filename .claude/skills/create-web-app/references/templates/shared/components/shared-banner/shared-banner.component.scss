@@ -1,0 +1,64 @@
+.shared-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid;
+
+  &__icon {
+    flex-shrink: 0;
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    line-height: 24px;
+  }
+
+  &__message {
+    line-height: 1.5;
+
+    p {
+      margin: 4px 0 0;
+      padding-left: 32px;
+    }
+
+    span {
+      margin: 0;
+    }
+  }
+
+  &--error {
+    background: var(--color-error-bg);
+    color: var(--color-error-text);
+    border-color: var(--color-error-text);
+  }
+
+  &--warning {
+    background: var(--color-warning-bg);
+    color: var(--color-warning-text);
+    border-color: var(--color-warning-text);
+  }
+
+  &--success {
+    background: var(--color-success-bg);
+    color: var(--color-success-text);
+    border-color: var(--color-success-text);
+  }
+
+  &--info {
+    background: var(--color-info-bg);
+    color: var(--color-info-text);
+    border-color: var(--color-info-text);
+  }
+}

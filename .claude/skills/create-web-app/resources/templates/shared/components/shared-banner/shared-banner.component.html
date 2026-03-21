@@ -1,0 +1,16 @@
+<div class="shared-banner" [class]="'shared-banner--' + type()">
+  @if (title()) {
+    <div class="shared-banner__content">
+      <h2 class="shared-banner__title">
+        <mat-icon class="shared-banner__icon">{{ iconName() }}</mat-icon>
+        {{ title() }}
+      </h2>
+      @if (message()) {
+        <p class="shared-banner__message">{{ message() }}</p>
+      }
+    </div>
+  } @else {
+    <mat-icon class="shared-banner__icon">{{ iconName() }}</mat-icon>
+    <span class="shared-banner__message">{{ message() }}</span>
+  }
+</div>

@@ -1,0 +1,33 @@
+// ============================================================================
+// MESSAGE/ALERT STYLES
+// ============================================================================
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 0.75rem var(--spacing-md);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+
+  mat-icon {
+    font-size: var(--font-size-xl);
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  &--error {
+    background: var(--color-error-bg);
+    color: var(--color-error-text);
+  }
+
+  &--success {
+    background: var(--color-success-bg);
+    color: var(--color-success-text);
+  }
+
+  &--warning {
+    background: var(--color-warning-bg);
+    color: var(--color-warning-text);
+  }
+}

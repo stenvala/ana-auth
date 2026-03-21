@@ -1,0 +1,69 @@
+// ============================================================================
+// CHIP/TAG STYLES
+// ============================================================================
+
+.chip {
+  background: var(--gradient-violet);
+  color: var(--color-text-on-primary);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(124, 58, 237, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.3px;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(124, 58, 237, 0.3);
+  }
+}
+
+// Chip color variants
+.chip--success {
+  background: var(--gradient-success);
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.25);
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+  }
+}
+
+.chip--warning {
+  background: var(--gradient-warm);
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.25);
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+  }
+}
+
+.chip--info {
+  background: var(--gradient-sky);
+  box-shadow: 0 2px 4px rgba(2, 132, 199, 0.25);
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(2, 132, 199, 0.3);
+  }
+}
+
+.chip--error {
+  background: var(--gradient-rose);
+  box-shadow: 0 2px 4px rgba(244, 63, 94, 0.25);
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(244, 63, 94, 0.3);
+  }
+}
+
+.chip--primary {
+  background: var(--gradient-primary);
+  box-shadow: 0 2px 4px rgba(63, 169, 129, 0.25);
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(63, 169, 129, 0.3);
+  }
+}
