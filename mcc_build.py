@@ -6,9 +6,9 @@ everything into output/ for deployment.
 """
 
 import shutil
-import subprocess
 import sys
 from pathlib import Path
+import os
 
 import typer
 
@@ -21,6 +21,18 @@ SRC_DIR = PROJECT_ROOT / "src"
 UI_DIR = SRC_DIR / "ui"
 OUTPUT_DIR = PROJECT_ROOT / "output"
 TEST_ARTIFACTS_DIR = PROJECT_ROOT / "test-artifacts"
+
+NODE_ENV = os.environ.copy()
+NODE_ENV["PATH"] = "/home/stenvala/.nvm/versions/node/v20.19.2/bin:" + NODE_ENV["PATH"]
+
+if sys.platform == "darwin":
+    print("Running on macOS")
+    NPM = "npm"
+    NPX = "npx"
+else:
+    print("Running on Linux")
+    NPM = "/home/stenvala/.nvm/versions/node/v20.19.2/bin/npm"
+    NPX = "/home/stenvala/.nvm/versions/node/v20.19.2/bin/npx"
 
 
 def clean_output() -> None:
@@ -68,10 +80,11 @@ def run_integration_tests() -> None:
 def build_frontend() -> None:
     """Build Angular frontend."""
     print("\n=== FRONTEND BUILD ===")
-    run(
-        ["bash", "-c", "source ~/.nvm/nvm.sh && nvm use && npx ng build"],
-        cwd=str(UI_DIR),
-    )
+
+    if not (UI_DIR / "node_modules").exists():
+        run([NPM, "ci"], cwd=UI_DIR, env=NODE_ENV)
+
+    run([NPX, "ng", "build", "--configuration=production"], cwd=UI_DIR, env=NODE_ENV)
 
 
 def assemble_output() -> None:
@@ -102,10 +115,15 @@ def assemble_output() -> None:
         _copy_tree(migrations_dir, db_out / "migrations")
 
     # Deploy scripts
-    for script in ["mcc_deploy.py", "mcc_common.py", "mcc_config.py", "setup_db.py", "backup_db.py"]:
+    for script in [
+        "mcc_deploy.py",
+        "mcc_common.py",
+        "mcc_config.py",
+        "setup_db.py",
+        "backup_db.py",
+    ]:
         src = PROJECT_ROOT / script
-        if src.exists():
-            shutil.copy2(src, OUTPUT_DIR / script)
+        shutil.copy2(src, OUTPUT_DIR / script)
 
     # MCC config files
     mcc_out = OUTPUT_DIR / "mcc"
@@ -114,14 +132,12 @@ def assemble_output() -> None:
     for f in mcc_dir.glob("conf-*.yml"):
         shutil.copy2(f, mcc_out / f.name)
     ensure_admin = mcc_dir / "ensure_admin.sql"
-    if ensure_admin.exists():
-        shutil.copy2(ensure_admin, mcc_out / "ensure_admin.sql")
+    shutil.copy2(ensure_admin, mcc_out / "ensure_admin.sql")
 
     # Project metadata
     for f in ["pyproject.toml", "uv.lock"]:
         src = PROJECT_ROOT / f
-        if src.exists():
-            shutil.copy2(src, OUTPUT_DIR / f)
+        shutil.copy2(src, OUTPUT_DIR / f)
 
     # Build info
     build_info = PROJECT_ROOT / "build_info.yml"
