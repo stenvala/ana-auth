@@ -1,0 +1,43 @@
+// ============================================================================
+// CARD GRID STYLES
+// Shared styles for card-based grid layouts (dashboard, settings, etc.)
+// ============================================================================
+
+// Card grid - responsive grid for feature/settings cards
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-xl);
+}
+
+// Feature card - clickable card with icon, title, description
+.feature-card {
+  cursor: pointer;
+  transition:
+    box-shadow var(--transition-normal),
+    transform var(--transition-normal);
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  mat-card-header {
+    mat-icon {
+      font-size: 36px;
+      width: 36px;
+      height: 36px;
+      color: var(--color-primary);
+      opacity: 0.9;
+    }
+  }
+
+  mat-card-content {
+    p {
+      margin: 0;
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+      line-height: 1.6;
+    }
+  }
+}

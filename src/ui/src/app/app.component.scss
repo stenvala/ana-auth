@@ -1,0 +1,19 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+router-outlet + * {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+core-navbar {
+  z-index: 200;
+}
+router-outlet {
+  z-index: 10;
+}

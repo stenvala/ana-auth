@@ -1,0 +1,96 @@
+[project]
+name = "ana-auth"
+version = "0.1.0"
+description = "Private SSO/OAuth authentication service"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    # Web framework
+    "fastapi>=0.116.1",
+    "uvicorn[standard]>=0.32.0",
+    "gunicorn>=23.0.0",
+
+    # Database
+    "sqlmodel>=0.0.22",
+    "psycopg2-binary>=2.9.9",
+
+    # Logging
+    "structlog>=24.4.0",
+
+    # CLI tools
+    "typer>=0.16.1",
+
+    # Authentication
+    "bcrypt>=4.1.0",
+
+    # Configuration
+    "pyyaml>=6.0.2",
+    "pydantic>=2.11.0",
+
+    # Process management
+    "psutil>=7.0.0",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py313"
+
+[tool.ruff.lint]
+extend-select = ["I"]
+
+[tool.ruff.lint.isort]
+force-single-line = false
+known-first-party = ["api", "shared"]
+
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "**/__init__.py",
+    "**/test_*.py",
+    "tests/*",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/.venv/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+precision = 1
+show_missing = true
+skip_covered = false
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+[tool.pytest.ini_options]
+testpaths = ["src/tests"]
+markers = [
+    "integration: marks tests as integration tests",
+    "e2e: marks tests as end-to-end tests",
+]
+asyncio_mode = "auto"
+timeout = 60
+addopts = "--timeout=60 -W ignore::UserWarning"
+
+[dependency-groups]
+dev = [
+    # Testing
+    "pytest>=8.4.1",
+    "pytest-cov>=6.2.1",
+    "pytest-asyncio>=0.25.0",
+    "pytest-timeout>=2.3.1",
+    "pytest-xdist>=3.8.0",
+    # Code quality
+    "ruff>=0.12.10",
+    # E2E
+    "playwright>=1.55.0",
+    "pytest-playwright>=0.7.1",
+    "httpx>=0.28.1",
+]

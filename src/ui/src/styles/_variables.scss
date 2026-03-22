@@ -1,0 +1,134 @@
+// ============================================================================
+// CSS CUSTOM PROPERTIES (Variables)
+// ============================================================================
+
+:root {
+  // Primary brand colors - Bold, professional palette
+  --color-primary: #3fa981; // Deep Emerald
+  --color-primary-dark: #318868;
+  --color-primary-light: #5cb894;
+  --color-secondary: #7c3aed; // Rich Violet
+  --color-accent: #ffc107; // Rich Amber
+  --color-accent-warm: #f59e0b; // Warm Orange
+
+  // Gradients - Bold and professional
+  --gradient-primary: linear-gradient(135deg, #3fa981 0%, #2dd4bf 100%);
+  --gradient-warm: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+  --gradient-cool: linear-gradient(135deg, #0891b2 0%, #3fa981 100%);
+  --gradient-success: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  --gradient-violet: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+  --gradient-rose: linear-gradient(135deg, #f43f5e 0%, #fb7185 100%);
+  --gradient-sky: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+
+  // Text colors - High contrast for readability
+  --color-text-primary: #1e293b;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94a3b8;
+  --color-text-on-primary: #ffffff;
+
+  // Background colors - Subtle warmth
+  --color-bg-page: #f8fafc;
+  --color-bg-card: #ffffff;
+  --color-bg-hover: #f1f5f9;
+  --color-bg-section: #fafbfc;
+  --color-bg-sidebar: #f9fafb;
+  --color-bg-banner: linear-gradient(135deg, #f0fdf4 0%, #ecfeff 100%);
+  --color-bg-overlay: rgba(15, 23, 42, 0.6);
+
+  // Badge/Status colors - Vibrant and distinct
+  --color-error-bg: #fef2f2;
+  --color-error-text: #dc2626;
+  --color-error-border: #fecaca;
+  --color-success-bg: #ecfdf5;
+  --color-success-text: #059669;
+  --color-success-border: #a7f3d0;
+  --color-warning-bg: #fffbeb;
+  --color-warning-text: #d97706;
+  --color-warning-border: #fde68a;
+  --color-info-bg: #eff6ff;
+  --color-info-text: #2563eb;
+  --color-info-border: #bfdbfe;
+
+  // Extended badge colors - For variety
+  --color-violet-bg: #f5f3ff;
+  --color-violet-text: #7c3aed;
+  --color-violet-border: #ddd6fe;
+  --color-rose-bg: #fff1f2;
+  --color-rose-text: #e11d48;
+  --color-rose-border: #fecdd3;
+  --color-cyan-bg: #ecfeff;
+  --color-cyan-text: #0891b2;
+  --color-cyan-border: #a5f3fc;
+  --color-orange-bg: #fff7ed;
+  --color-orange-text: #ea580c;
+  --color-orange-border: #fed7aa;
+  --color-teal-bg: #f0fdfa;
+  --color-teal-text: #0d9488;
+  --color-teal-border: #99f6e4;
+  --color-indigo-bg: #eef2ff;
+  --color-indigo-text: #4f46e5;
+  --color-indigo-border: #c7d2fe;
+  --color-pink-bg: #fdf2f8;
+  --color-pink-text: #db2777;
+  --color-pink-border: #fbcfe8;
+  --color-lime-bg: #f7fee7;
+  --color-lime-text: #65a30d;
+  --color-lime-border: #d9f99d;
+  --color-slate-bg: #f1f5f9;
+  --color-slate-text: #475569;
+  --color-slate-border: #cbd5e1;
+  --color-emerald-bg: #ecfdf5;
+  --color-emerald-text: #059669;
+  --color-emerald-border: #a7f3d0;
+  --color-amber-bg: #fffbeb;
+  --color-amber-text: #d97706;
+  --color-amber-border: #fde68a;
+  --color-sky-bg: #f0f9ff;
+  --color-sky-text: #0284c7;
+  --color-sky-border: #bae6fd;
+  --color-fuchsia-bg: #fdf4ff;
+  --color-fuchsia-text: #c026d3;
+  --color-fuchsia-border: #f5d0fe;
+
+  // Shadows - More pronounced for depth
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+  --shadow-toolbar: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0 12px 20px rgba(63, 169, 129, 0.15), 0 4px 6px rgba(0, 0, 0, 0.05);
+
+  // Border radius - Modern rounded corners
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-pill: 24px;
+
+  // Spacing
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  // Typography
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.1rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.75rem;
+  --font-size-4xl: 2rem;
+
+  // Max widths
+  --max-width-form-sm: 400px;
+  --max-width-form-md: 440px;
+  --max-width-form-lg: 600px;
+  --max-width-content: 1400px;
+
+  // Transitions
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.2s ease;
+}

@@ -1,0 +1,64 @@
+@use '@angular/material' as mat;
+@use 'theme-colors' as theme;
+
+// Design System Partials
+@use 'styles/variables';
+@use 'styles/base';
+@use 'styles/layout';
+@use 'styles/pages';
+@use 'styles/components';
+@use 'styles/cards';
+@use 'styles/grids';
+@use 'styles/forms';
+@use 'styles/dialogs';
+@use 'styles/buttons';
+@use 'styles/alerts';
+@use 'styles/toolbar';
+@use 'styles/sections';
+@use 'styles/chips';
+@use 'styles/resize';
+@use 'styles/drag-drop';
+@use 'styles/material-overrides';
+@use 'styles/badges';
+@use 'styles/lists';
+
+html {
+  height: 100%;
+  color-scheme: dark;
+
+  @include mat.theme(
+    (
+      color: (
+        primary: theme.$primary-palette,
+        tertiary: theme.$tertiary-palette,
+        theme-type: dark,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+
+  @media (prefers-color-scheme: light) {
+    color-scheme: light;
+
+    @include mat.theme(
+      (
+        color: (
+          primary: theme.$primary-palette,
+          tertiary: theme.$tertiary-palette,
+          theme-type: light,
+        ),
+        typography: Roboto,
+        density: 0,
+      )
+    );
+  }
+}
+
+body {
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+  height: 100%;
+}

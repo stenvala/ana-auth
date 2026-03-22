@@ -1,7 +1,7 @@
 # 1.init-project -- Progress Index
 
 **Created**: 2026-03-21
-**Current Phase**: taskify
+**Current Phase**: codify
 **Ticket ID**: 1
 **Generated with**: as-taskify
 
@@ -18,21 +18,21 @@
 
 **Ticket ID**:
 
-**Implementation**: Not Started
+**Implementation**: Complete
 
 - [Accepted] [functional-spec.md](specs/01-project-readme/functional-spec.md)
 - [Accepted] [technical-spec.md](specs/01-project-readme/technical-spec.md)
-- [Accepted] [tasks.md](specs/01-project-readme/tasks.md) (0/1 tasks complete)
+- [Accepted] [tasks.md](specs/01-project-readme/tasks.md) (1/1 tasks complete)
 
 #### 02-backend-skeleton
 
 **Ticket ID**:
 
-**Implementation**: Not Started
+**Implementation**: Complete
 
 - [Accepted] [functional-spec.md](specs/02-backend-skeleton/functional-spec.md)
 - [Accepted] [technical-spec.md](specs/02-backend-skeleton/technical-spec.md)
-- [Accepted] [tasks.md](specs/02-backend-skeleton/tasks.md) (0/11 tasks complete)
+- [Accepted] [tasks.md](specs/02-backend-skeleton/tasks.md) (11/11 tasks complete)
 - [api-contract.md](specs/02-backend-skeleton/api-contract.md)
 - [test-automation-plan.md](specs/02-backend-skeleton/test-automation-plan.md)
 - [manual-testing-plan.md](specs/02-backend-skeleton/manual-testing-plan.md)
@@ -97,6 +97,6 @@
 | Storify (Functional Specs) | Accepted |
 | Research | Complete |
 | Techify (Technical Specs) | Accepted |
-| Taskify (Tasks) | Draft |
-| Codify (Implementation) | Not Started |
+| Taskify (Tasks) | Accepted |
+| Codify (Implementation) | In Progress |
 | Docufy (Archive) | Not Started |

@@ -27,7 +27,7 @@ Files:
 
 Verify: `uv sync` completes without errors.
 
-- [ ] P01.T001
+- [x] P01.T001
 
 ### P01.T002 -- Create Docker Compose for local PostgreSQL
 
@@ -43,7 +43,7 @@ Files:
 
 Verify: `docker compose up -d` starts PostgreSQL.
 
-- [ ] P01.T002
+- [x] P01.T002
 
 ### P01.T003 -- Create .nvmrc for Node.js version
 
@@ -52,7 +52,7 @@ Create `.nvmrc` at project root containing `20.19.2`.
 Files:
 - Create `.nvmrc`
 
-- [ ] P01.T003
+- [x] P01.T003
 
 ---
 
@@ -76,7 +76,7 @@ Files:
 - Create `src/shared/__init__.py`
 - Create `src/shared/config.py`
 
-- [ ] P02.T001
+- [x] P02.T001
 
 ### P02.T002 -- Create DBContext with schema-based multitenancy
 
@@ -92,7 +92,7 @@ Files:
 - Create `src/shared/db/__init__.py`
 - Create `src/shared/db/db_context.py`
 
-- [ ] P02.T002
+- [x] P02.T002
 
 ### P02.T003 -- Create BaseDBModelMixin
 
@@ -104,7 +104,7 @@ Files:
 - Create `src/shared/db/models/__init__.py`
 - Create `src/shared/db/models/base_model.py`
 
-- [ ] P02.T003
+- [x] P02.T003
 
 ### API Layer
 
@@ -123,7 +123,7 @@ Files:
 - Create `src/api/__init__.py`
 - Create `src/api/middleware.py`
 
-- [ ] P02.T004
+- [x] P02.T004
 
 ### P02.T005 -- Create FastAPI application factory
 
@@ -139,7 +139,7 @@ Create `src/api/main.py` with `create_app()` factory:
 Files:
 - Create `src/api/main.py`
 
-- [ ] P02.T005
+- [x] P02.T005
 
 ### P02.T006 -- Create health check router
 
@@ -156,7 +156,7 @@ Files:
 
 Verify: `cd src && uv run python -c "from api.main import app; print('OK')"` succeeds.
 
-- [ ] P02.T006
+- [x] P02.T006
 
 ---
 
@@ -179,7 +179,7 @@ Files:
 
 Verify: `uv run pytest src/tests/unit/api/routers/test_health.py -v` passes.
 
-- [ ] P03.T001
+- [x] P03.T001
 
 ### P03.T002 -- Create DBContext and config unit tests
 
@@ -196,7 +196,7 @@ Files:
 
 Verify: `uv run pytest src/tests/unit/shared/ -v` passes.
 
-- [ ] P03.T002
+- [x] P03.T002
 
 ---
 

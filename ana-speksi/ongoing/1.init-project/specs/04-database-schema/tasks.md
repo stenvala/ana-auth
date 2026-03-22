@@ -20,7 +20,7 @@ Files:
 - Create `src/shared/db/schema/` directory
 - Create `src/shared/db/migrations/` directory
 
-- [ ] P01.T001
+- [x] P01.T001
 
 ---
 
@@ -41,7 +41,7 @@ Create `src/shared/db/schema/create_schema.sql` with:
 Files:
 - Create `src/shared/db/schema/create_schema.sql`
 
-- [ ] P02.T001
+- [x] P02.T001
 
 ### P02.T002 -- Create master admin seed SQL
 
@@ -55,7 +55,7 @@ Create `src/shared/db/schema/ensure_admin.sql` with:
 Files:
 - Create `src/shared/db/schema/ensure_admin.sql`
 
-- [ ] P02.T002
+- [x] P02.T002
 
 ### P02.T003 -- Create initial migration file
 
@@ -66,7 +66,7 @@ Create `src/shared/db/migrations/001_initial.sql` matching the create_schema.sql
 Files:
 - Create `src/shared/db/migrations/001_initial.sql`
 
-- [ ] P02.T003
+- [x] P02.T003
 
 ### P02.T004 -- Create setup_db.py typer CLI
 
@@ -86,7 +86,7 @@ Files:
 
 Verify: `uv run setup_db.py --help` shows all commands.
 
-- [ ] P02.T004
+- [x] P02.T004
 
 ### P02.T005 -- Create SQLModel classes for user tables
 
@@ -101,7 +101,7 @@ Files:
 - Create `src/shared/db/models/user_account.py`
 - Create `src/shared/db/models/user_email.py`
 
-- [ ] P02.T005
+- [x] P02.T005
 
 ---
 
@@ -127,7 +127,7 @@ Files:
 
 Verify: `uv run pytest src/tests/integration/db/test_setup_db.py -v` passes.
 
-- [ ] P03.T001
+- [x] P03.T001
 
 ---
 

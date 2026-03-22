@@ -1,0 +1,36 @@
+// ============================================================================
+// DIALOG STYLES
+// Common styles for dialog components
+// ============================================================================
+
+// Dialog form layout
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+// Dialog hint text
+.dialog-hint {
+  font-size: var(--font-size-xs);
+  color: var(--mat-sys-on-surface-variant);
+  margin-top: 4px;
+}
+
+// Dialog section header
+.dialog-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+
+  h3 {
+    margin: 0;
+    font-size: var(--font-size-base);
+    font-weight: 500;
+  }
+}

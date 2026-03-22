@@ -37,7 +37,7 @@ Create `README.md` at the repository root with sections:
 Files:
 - Create `README.md`
 
-- [ ] P02.T001
+- [x] P02.T001
 
 ---
 

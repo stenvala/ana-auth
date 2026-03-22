@@ -27,7 +27,7 @@ Add pytest configuration to `pyproject.toml`:
 Files:
 - Modify `pyproject.toml` (add [tool.pytest] and [tool.coverage] sections)
 
-- [ ] P01.T001
+- [x] P01.T001
 
 ---
 
@@ -54,7 +54,7 @@ Files:
 
 Verify: `uv run run_tests.py --help` shows all commands.
 
-- [ ] P02.T001
+- [x] P02.T001
 
 ### P02.T002 -- Create root conftest.py with schema fixtures
 
@@ -68,7 +68,7 @@ Create `src/tests/conftest.py` with:
 Files:
 - Create `src/tests/conftest.py`
 
-- [ ] P02.T002
+- [x] P02.T002
 
 ### P02.T003 -- Create unit test conftest with mock fixtures
 
@@ -81,7 +81,7 @@ Create `src/tests/unit/conftest.py` with mock-oriented fixtures:
 Files:
 - Create `src/tests/unit/conftest.py`
 
-- [ ] P02.T003
+- [x] P02.T003
 
 ### P02.T004 -- Create integration test conftest with TestClient
 
@@ -94,7 +94,7 @@ Create `src/tests/integration/conftest.py` with:
 Files:
 - Create `src/tests/integration/conftest.py`
 
-- [ ] P02.T004
+- [x] P02.T004
 
 ### P02.T005 -- Create E2E conftest with Playwright fixtures
 
@@ -109,7 +109,7 @@ Files:
 - Create `src/tests/e2e/__init__.py`
 - Create `src/tests/e2e/conftest.py`
 
-- [ ] P02.T005
+- [x] P02.T005
 
 ### P02.T006 -- Create E2E page objects
 
@@ -123,7 +123,7 @@ Files:
 - Create `src/tests/e2e/pages/base_page.py`
 - Create `src/tests/e2e/pages/landing_page.py`
 
-- [ ] P02.T006
+- [x] P02.T006
 
 ---
 
@@ -144,7 +144,7 @@ Files:
 
 Verify: `uv run pytest src/tests/integration/api/routers/test_health.py -v` passes.
 
-- [ ] P03.T001
+- [x] P03.T001
 
 ### E2E Tests
 
@@ -159,7 +159,7 @@ Files:
 
 Verify: `uv run run_tests.py e2e` passes (requires running services).
 
-- [ ] P03.T002
+- [x] P03.T002
 
 ---
 

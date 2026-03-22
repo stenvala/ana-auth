@@ -26,7 +26,7 @@ Files:
 
 Verify: `nvm use 20.19.2 && cd src/ui && npx ng build --configuration=development` succeeds.
 
-- [ ] P01.T001
+- [x] P01.T001
 
 ### P01.T002 -- Add Angular Material v3
 
@@ -40,7 +40,7 @@ Files:
 - Modified `src/ui/package.json`
 - Modified `src/ui/angular.json`
 
-- [ ] P01.T002
+- [x] P01.T002
 
 ---
 
@@ -63,7 +63,7 @@ Files:
 - Modify `src/ui/src/styles.scss`
 - Modify `src/ui/src/index.html` (add color-scheme: dark)
 
-- [ ] P02.T001
+- [x] P02.T001
 
 ### P02.T002 -- Create API proxy configuration
 
@@ -76,7 +76,7 @@ Files:
 - Create `src/ui/proxy.conf.json`
 - Modify `src/ui/angular.json` (add proxy config to serve target, set port to 6785)
 
-- [ ] P02.T002
+- [x] P02.T002
 
 ### P02.T003 -- Create core and shared modules
 
@@ -92,7 +92,7 @@ Files:
 - Create `src/ui/src/app/core/material.module.ts`
 - Create `src/ui/src/app/shared/shared.module.ts`
 
-- [ ] P02.T003
+- [x] P02.T003
 
 ### P02.T004 -- Create landing page component
 
@@ -109,7 +109,7 @@ Files:
 - Create `src/ui/src/app/features/landing/landing.component.html`
 - Create `src/ui/src/app/features/landing/landing.component.scss`
 
-- [ ] P02.T004
+- [x] P02.T004
 
 ### P02.T005 -- Configure routing
 
@@ -127,7 +127,7 @@ Files:
 
 Verify: `nvm use 20.19.2 && cd src/ui && npx ng build --configuration=development` succeeds.
 
-- [ ] P02.T005
+- [x] P02.T005
 
 ---
 
