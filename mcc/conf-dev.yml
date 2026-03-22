@@ -1,0 +1,17 @@
+STAGE: dev
+REMOTE_USER: stenvala
+REMOTE_HOST: mathcodingclub.com
+REMOTE_BASE: /home/stenvala/live/auth-dev
+SERVICE_NAME: ana-auth-dev.service
+DOMAIN: auth-dev.mathcodingclub.com
+DB_HOST: PLACEHOLDER_DB_HOST
+DB_PORT: "5432"
+DB_USER: PLACEHOLDER_DB_USER
+DB_PASSWORD: PLACEHOLDER_DB_PASSWORD
+DB_NAME: postgres
+DB_SCHEMA_SUFFIX: dev
+API_PORT: "6785"
+WORKERS: "2"
+API_SYMLINK: "{{REMOTE_BASE}}/current-api"
+UI_SYMLINK: "{{REMOTE_BASE}}/current-ui"
+LOG_ROOT: "{{REMOTE_BASE}}/logs"

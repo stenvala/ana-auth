@@ -1,4 +1,4 @@
-import { signal, Signal, WritableSignal } from '@angular/core';
+import { signal, Signal, WritableSignal } from "@angular/core";
 
 /**
  * Simple value store using Angular signals.

@@ -380,7 +380,7 @@
   // Bottom padding for scrollable content - uses pseudo-element because
   // padding-bottom on overflow:scroll containers gets collapsed
   &::after {
-    content: '';
+    content: "";
     display: block;
     height: 50px;
   }

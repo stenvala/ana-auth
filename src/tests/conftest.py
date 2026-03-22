@@ -34,7 +34,11 @@ def test_schema_suffix() -> Generator[str, None, None]:
     yield suffix
 
     conn = psycopg2.connect(
-        host="localhost", port=5432, database="postgres", user="postgres", password="postgres"
+        host="localhost",
+        port=5432,
+        database="postgres",
+        user="postgres",
+        password="postgres",
     )
     conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
     cursor = conn.cursor()

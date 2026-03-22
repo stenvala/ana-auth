@@ -1,4 +1,4 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from "@angular/core";
 import {
   Router,
   Event,
@@ -6,25 +6,25 @@ import {
   ActivationEnd,
   Params,
   ActivationStart,
-} from '@angular/router';
+} from "@angular/router";
 
 export interface RouteData {
   hideNavbar?: boolean;
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: "root" })
 export class CoreNavService {
-  currentPath = signal<string>('');
+  currentPath = signal<string>("");
   currentPathTemplate = computed(() => {
     const reverseRouteParamMap = Object.keys(this.routeParamMap()).reduce(
       (acc, key) => {
-        acc[this.routeParamMap()[key]] = '/:' + key;
+        acc[this.routeParamMap()[key]] = "/:" + key;
         return acc;
       },
       {} as Record<string, string>,
     );
-    const template = this.getPath(this.currentPath(), reverseRouteParamMap, '/');
-    return template.length > 0 ? template.substring(1) : '';
+    const template = this.getPath(this.currentPath(), reverseRouteParamMap, "/");
+    return template.length > 0 ? template.substring(1) : "";
   });
 
   routeParamMap = signal<Record<string, string>>({});
@@ -43,7 +43,7 @@ export class CoreNavService {
         this.queryParamMap.set(i.snapshot.queryParams);
         this.routeData.set(i.snapshot.data as RouteData);
       }
-      if ('url' in i && i.url !== this.currentPath()) {
+      if ("url" in i && i.url !== this.currentPath()) {
         this.currentPath.set(i.url);
       }
     });
@@ -59,7 +59,7 @@ export class CoreNavService {
     });
   }
 
-  getPath(path: string, params?: { [key: string]: string | number }, prefix: string = ':') {
+  getPath(path: string, params?: { [key: string]: string | number }, prefix: string = ":") {
     if (params) {
       Object.keys(params).forEach((key) => {
         path = path.replace(`${prefix}${key}`, params[key].toString());
@@ -80,7 +80,7 @@ export class CoreNavService {
       this.router.navigate([], {
         relativeTo: this.activatedRoute,
         queryParams: this.pendingQpUpdates,
-        queryParamsHandling: 'merge',
+        queryParamsHandling: "merge",
       });
       this.pendingQpUpdates = {};
     };

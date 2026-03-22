@@ -3,7 +3,7 @@
 // ============================================================================
 
 // Banner (mat-toolbar used as page banner/header)
-mat-toolbar[role='banner'] {
+mat-toolbar[role="banner"] {
   background: linear-gradient(135deg, #f0fdf4 0%, #ecfeff 100%) !important;
   border-bottom: 1px solid rgba(63, 169, 129, 0.15);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
@@ -68,7 +68,7 @@ mat-card {
 // ============================================================================
 
 // Filled buttons (primary actions)
-button[matButton='filled'] {
+button[matButton="filled"] {
   background: var(--gradient-primary) !important;
   color: white !important;
   font-weight: 500 !important;
@@ -86,7 +86,7 @@ button[matButton='filled'] {
 }
 
 // Outlined buttons (secondary actions)
-button[matButton='outlined'] {
+button[matButton="outlined"] {
   border-color: var(--color-primary) !important;
   color: var(--color-primary) !important;
   font-weight: 500 !important;
@@ -99,7 +99,7 @@ button[matButton='outlined'] {
 }
 
 // Tonal buttons
-button[matButton='tonal'] {
+button[matButton="tonal"] {
   background-color: rgba(63, 169, 129, 0.12) !important;
   color: var(--color-primary-dark) !important;
   font-weight: 500 !important;
@@ -132,8 +132,8 @@ button[matButton='tonal'] {
 
 // Success/Active state chips (green)
 .mat-mdc-chip.mat-primary,
-.mat-mdc-chip[class*='success'],
-.mat-mdc-chip[class*='active'] {
+.mat-mdc-chip[class*="success"],
+.mat-mdc-chip[class*="active"] {
   background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important;
   color: #047857 !important;
   border-color: #a7f3d0 !important;
@@ -141,8 +141,8 @@ button[matButton='tonal'] {
 
 // Error/Inactive state chips (gray)
 .mat-mdc-chip.mat-accent,
-.mat-mdc-chip[class*='inactive'],
-.mat-mdc-chip[class*='closed'] {
+.mat-mdc-chip[class*="inactive"],
+.mat-mdc-chip[class*="closed"] {
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
   color: #475569 !important;
   border-color: #cbd5e1 !important;
@@ -150,15 +150,15 @@ button[matButton='tonal'] {
 
 // Warning state chips (amber)
 .mat-mdc-chip.mat-warn,
-.mat-mdc-chip[class*='warning'] {
+.mat-mdc-chip[class*="warning"] {
   background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%) !important;
   color: #b45309 !important;
   border-color: #fde68a !important;
 }
 
 // Info/Default chips (blue)
-.mat-mdc-chip[class*='info'],
-.mat-mdc-chip[class*='default'] {
+.mat-mdc-chip[class*="info"],
+.mat-mdc-chip[class*="default"] {
   background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%) !important;
   color: #1d4ed8 !important;
   border-color: #bfdbfe !important;

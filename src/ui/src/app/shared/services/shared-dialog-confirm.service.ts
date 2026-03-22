@@ -1,14 +1,14 @@
-import { Injectable, inject } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { Injectable, inject } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import {
   SharedConfirmDialogComponent,
   ConfirmDialogData,
-} from '../components/shared-confirm-dialog/shared-confirm-dialog.component';
+} from "../components/shared-confirm-dialog/shared-confirm-dialog.component";
 
-export type { ConfirmDialogData } from '../components/shared-confirm-dialog/shared-confirm-dialog.component';
+export type { ConfirmDialogData } from "../components/shared-confirm-dialog/shared-confirm-dialog.component";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class SharedDialogConfirmService {
   private readonly dialog = inject(MatDialog);
@@ -19,21 +19,21 @@ export class SharedDialogConfirmService {
 
   async confirmDelete(itemName: string): Promise<boolean> {
     return await this.confirm({
-      title: 'Confirm deletion',
+      title: "Confirm deletion",
       message: `Are you sure you want to delete "${itemName}"?`,
-      confirmText: 'Delete',
-      cancelText: 'Cancel',
-      confirmColor: 'warn',
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      confirmColor: "warn",
     });
   }
 
   async confirmDiscard(): Promise<boolean> {
     return await this.confirm({
-      title: 'Unsaved changes',
-      message: 'You have unsaved changes. Do you want to discard them?',
-      confirmText: 'Discard',
-      cancelText: 'Continue editing',
-      confirmColor: 'warn',
+      title: "Unsaved changes",
+      message: "You have unsaved changes. Do you want to discard them?",
+      confirmText: "Discard",
+      cancelText: "Continue editing",
+      confirmColor: "warn",
     });
   }
 }

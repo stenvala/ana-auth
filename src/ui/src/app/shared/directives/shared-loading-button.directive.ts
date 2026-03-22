@@ -1,5 +1,5 @@
-import { Directive, ElementRef, inject, signal, effect, input } from '@angular/core';
-import { SharedConfirmService } from '../services/shared-confirm.service';
+import { Directive, ElementRef, inject, signal, effect, input } from "@angular/core";
+import { SharedConfirmService } from "../services/shared-confirm.service";
 
 /**
  * Directive for async button operations with loading state and optional confirmation.
@@ -21,10 +21,10 @@ import { SharedConfirmService } from '../services/shared-confirm.service';
  *   };
  */
 @Directive({
-  selector: '[sharedLoadingButton]',
+  selector: "[sharedLoadingButton]",
 
   host: {
-    '(click)': 'onClick($event)',
+    "(click)": "onClick($event)",
   },
 })
 export class SharedLoadingButtonDirective {
@@ -33,7 +33,7 @@ export class SharedLoadingButtonDirective {
 
   loadingClick = input.required<() => Promise<unknown>>();
   confirm = input(false);
-  confirmKey = input('');
+  confirmKey = input("");
 
   private readonly loading = signal(false);
   private readonly confirming = signal(false);
@@ -43,37 +43,37 @@ export class SharedLoadingButtonDirective {
   constructor() {
     effect(() => {
       const button = this.el.nativeElement;
-      const matIcon = button.querySelector('mat-icon');
+      const matIcon = button.querySelector("mat-icon");
 
       if (this.loading()) {
         if (!this.originalButtonDisabled) {
           this.originalButtonDisabled = button.disabled;
         }
         button.disabled = true;
-        button.classList.add('loading');
+        button.classList.add("loading");
 
         if (matIcon && this.originalIconText === null) {
           this.originalIconText = matIcon.textContent;
-          matIcon.textContent = 'sync';
-          matIcon.classList.add('spinning');
+          matIcon.textContent = "sync";
+          matIcon.classList.add("spinning");
         }
       } else {
         if (!this.originalButtonDisabled) {
           button.disabled = false;
         }
-        button.classList.remove('loading');
+        button.classList.remove("loading");
 
         if (matIcon && this.originalIconText !== null) {
           matIcon.textContent = this.originalIconText;
-          matIcon.classList.remove('spinning');
+          matIcon.classList.remove("spinning");
           this.originalIconText = null;
         }
       }
 
       if (this.confirming()) {
-        button.classList.add('confirming');
+        button.classList.add("confirming");
       } else {
-        button.classList.remove('confirming');
+        button.classList.remove("confirming");
       }
     });
   }

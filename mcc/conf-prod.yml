@@ -1,0 +1,19 @@
+STAGE: prod
+REMOTE_USER: stenvala
+REMOTE_HOST: mathcodingclub.com
+REMOTE_BASE: /home/stenvala/live/auth
+SERVICE_NAME: ana-auth.service
+DOMAIN: auth.mathcodingclub.com
+DB_HOST: PLACEHOLDER_DB_HOST
+DB_PORT: "5432"
+DB_USER: PLACEHOLDER_DB_USER
+DB_PASSWORD: PLACEHOLDER_DB_PASSWORD
+DB_NAME: postgres
+DB_SCHEMA_SUFFIX: main
+API_PORT: "6784"
+WORKERS: "2"
+API_SYMLINK: "{{REMOTE_BASE}}/current-api"
+UI_SYMLINK: "{{REMOTE_BASE}}/current-ui"
+LOG_ROOT: "{{REMOTE_BASE}}/logs"
+CRON_JOBS: |
+  0 2 * * * cd {{REMOTE_BASE}} && .venv/bin/python backup_db.py main >> logs/backup.log 2>&1

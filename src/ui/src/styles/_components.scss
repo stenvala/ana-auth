@@ -508,7 +508,9 @@
     border: 1px solid transparent;
     border-radius: 4px;
     background: transparent;
-    transition: border-color var(--transition-fast), background-color var(--transition-fast);
+    transition:
+      border-color var(--transition-fast),
+      background-color var(--transition-fast);
 
     &:hover {
       border-color: rgba(0, 0, 0, 0.12);

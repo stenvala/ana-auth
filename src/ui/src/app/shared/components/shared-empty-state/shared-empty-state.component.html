@@ -1,7 +1,4 @@
-<div
-  class="shared-empty-state"
-  [class.shared-empty-state--small]="size() === 'small'"
->
+<div class="shared-empty-state" [class.shared-empty-state--small]="size() === 'small'">
   @if (icon()) {
     <mat-icon class="shared-empty-state__icon">{{ icon() }}</mat-icon>
   }

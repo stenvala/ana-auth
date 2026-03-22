@@ -107,9 +107,10 @@ class ApiMiddleware(BaseHTTPMiddleware):
             return self._handle_value_error(exception, request_id)
         if isinstance(exception, PermissionError):
             return self._handle_permission_error(request_id)
-        if isinstance(exception, FileNotFoundError) or "not found" in str(
-            exception
-        ).lower():
+        if (
+            isinstance(exception, FileNotFoundError)
+            or "not found" in str(exception).lower()
+        ):
             return self._handle_not_found_error(exception, request_id)
         return self._handle_system_error(request_id)
 

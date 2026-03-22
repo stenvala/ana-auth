@@ -7,30 +7,30 @@ import {
   OnDestroy,
   signal,
   effect,
-} from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+} from "@angular/core";
+import { FormsModule } from "@angular/forms";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from "@angular/material/input";
+import { MatIconModule } from "@angular/material/icon";
+import { MatButtonModule } from "@angular/material/button";
+import { Subject, debounceTime, distinctUntilChanged, takeUntil } from "rxjs";
 
 @Component({
-  selector: 'shared-search-input',
+  selector: "shared-search-input",
 
   imports: [FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './shared-search-input.component.html',
-  styleUrl: './shared-search-input.component.scss',
+  templateUrl: "./shared-search-input.component.html",
+  styleUrl: "./shared-search-input.component.scss",
 })
 export class SharedSearchInputComponent implements OnInit, OnDestroy {
-  placeholder = input<string>('Hae...');
+  placeholder = input<string>("Hae...");
   debounceMs = input<number>(300);
-  initialValue = input<string>('');
+  initialValue = input<string>("");
 
   searchChange = output<string>();
 
-  readonly value = signal('');
+  readonly value = signal("");
 
   private readonly input$ = new Subject<string>();
   private readonly destroy$ = new Subject<void>();
@@ -63,7 +63,7 @@ export class SharedSearchInputComponent implements OnInit, OnDestroy {
   }
 
   clear(): void {
-    this.value.set('');
-    this.input$.next('');
+    this.value.set("");
+    this.input$.next("");
   }
 }

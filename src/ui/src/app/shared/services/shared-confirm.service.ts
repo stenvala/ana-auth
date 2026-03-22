@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal } from "@angular/core";
 
 export interface ConfirmState {
   active: boolean;
@@ -6,10 +6,10 @@ export interface ConfirmState {
 }
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class SharedConfirmService {
-  private readonly confirmState = signal<ConfirmState>({ active: false, key: '' });
+  private readonly confirmState = signal<ConfirmState>({ active: false, key: "" });
   private confirmTimeout: ReturnType<typeof setTimeout> | null = null;
 
   readonly state = this.confirmState.asReadonly();
@@ -44,6 +44,6 @@ export class SharedConfirmService {
       clearTimeout(this.confirmTimeout);
       this.confirmTimeout = null;
     }
-    this.confirmState.set({ active: false, key: '' });
+    this.confirmState.set({ active: false, key: "" });
   }
 }

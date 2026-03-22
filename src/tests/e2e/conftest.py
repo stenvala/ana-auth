@@ -32,7 +32,11 @@ def e2e_schema_suffix() -> Generator[str, None, None]:
     yield suffix
 
     conn = psycopg2.connect(
-        host="localhost", port=5432, database="postgres", user="postgres", password="postgres"
+        host="localhost",
+        port=5432,
+        database="postgres",
+        user="postgres",
+        password="postgres",
     )
     conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
     cursor = conn.cursor()
@@ -51,9 +55,7 @@ def e2e_base_url() -> str:
 def e2e_db_session(e2e_schema_suffix: str) -> Generator[Session, None, None]:
     """Database session for E2E test data setup."""
     schema_name = f"ana-auth-{e2e_schema_suffix}"
-    test_engine = create_engine(
-        f"{DATABASE_URL}?options=-csearch_path%3D{schema_name}"
-    )
+    test_engine = create_engine(f"{DATABASE_URL}?options=-csearch_path%3D{schema_name}")
     try:
         with Session(test_engine) as session:
             try:

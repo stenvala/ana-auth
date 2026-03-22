@@ -124,7 +124,9 @@ class TestRunner:
 
             full_output = result.stdout or ""
             if result.stderr:
-                full_output = f"{full_output}\n{result.stderr}" if full_output else result.stderr
+                full_output = (
+                    f"{full_output}\n{result.stderr}" if full_output else result.stderr
+                )
 
             if full_output:
                 typer.echo(f"  {label} failed:")
@@ -159,16 +161,25 @@ class TestRunner:
         )
 
     def run_ty_check(self) -> bool:
-        return self._run_tracked("ty", ["uv", "run", "ty", "check"])
+        return self._run_tracked(
+            "ty",
+            ["uv", "run", "ty", "check"],
+            cwd=self.src_dir,
+        )
 
     def run_cyclomatic_complexity(self, max_complexity: int = 10) -> bool:
         return self._run_tracked(
             "Cyclomatic Complexity",
             [
-                "uv", "run", "ruff", "check", ".",
+                "uv",
+                "run",
+                "ruff",
+                "check",
+                ".",
                 "--select=C901",
                 f"--config=lint.mccabe.max-complexity={max_complexity}",
-                "--exclude=tests", "--exclude=ui",
+                "--exclude=tests",
+                "--exclude=ui",
             ],
             cwd=self.src_dir,
         )
@@ -228,9 +239,7 @@ class TestRunner:
         if debug:
             env = {"PWDEBUG": "1"}
 
-        return self._run_tracked(
-            config.suite_name, command, cwd=self.src_dir, env=env
-        )
+        return self._run_tracked(config.suite_name, command, cwd=self.src_dir, env=env)
 
     def print_summary(self) -> None:
         self.log_header("TEST EXECUTION SUMMARY")
@@ -254,27 +263,45 @@ app = typer.Typer(help="Centralized test runner for ana-auth project")
 
 @app.command()
 def unit(
-    coverage: bool = typer.Option(False, "--coverage", "-c", help="Include coverage reporting"),
+    coverage: bool = typer.Option(
+        False, "--coverage", "-c", help="Include coverage reporting"
+    ),
     file: Optional[str] = typer.Option(None, "--file", help="Run specific test file"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
-    stop_on_first_failure: bool = typer.Option(False, "--stop-on-first-failure", "-x", help="Stop on first failure"),
+    stop_on_first_failure: bool = typer.Option(
+        False, "--stop-on-first-failure", "-x", help="Stop on first failure"
+    ),
 ) -> None:
     """Run Python unit tests (excludes integration tests)."""
     runner = TestRunner(verbose=verbose)
-    success = runner.run_pytest(PYTEST_CONFIGS["unit"], coverage=coverage, file_pattern=file, stop_on_first_failure=stop_on_first_failure)
+    success = runner.run_pytest(
+        PYTEST_CONFIGS["unit"],
+        coverage=coverage,
+        file_pattern=file,
+        stop_on_first_failure=stop_on_first_failure,
+    )
     _exit_on_failure(runner, success)
 
 
 @app.command(name="int")
 def integration(
-    coverage: bool = typer.Option(False, "--coverage", "-c", help="Include coverage reporting"),
+    coverage: bool = typer.Option(
+        False, "--coverage", "-c", help="Include coverage reporting"
+    ),
     file: Optional[str] = typer.Option(None, "--file", help="Run specific test file"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
-    stop_on_first_failure: bool = typer.Option(False, "--stop-on-first-failure", "-x", help="Stop on first failure"),
+    stop_on_first_failure: bool = typer.Option(
+        False, "--stop-on-first-failure", "-x", help="Stop on first failure"
+    ),
 ) -> None:
     """Run Python integration tests only."""
     runner = TestRunner(verbose=verbose)
-    success = runner.run_pytest(PYTEST_CONFIGS["integration"], coverage=coverage, file_pattern=file, stop_on_first_failure=stop_on_first_failure)
+    success = runner.run_pytest(
+        PYTEST_CONFIGS["integration"],
+        coverage=coverage,
+        file_pattern=file,
+        stop_on_first_failure=stop_on_first_failure,
+    )
     _exit_on_failure(runner, success)
 
 
@@ -282,26 +309,45 @@ def integration(
 def e2e(
     file: Optional[str] = typer.Option(None, "--file", help="Run specific test file"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
-    stop_on_first_failure: bool = typer.Option(False, "--stop-on-first-failure", "-x", help="Stop on first failure"),
+    stop_on_first_failure: bool = typer.Option(
+        False, "--stop-on-first-failure", "-x", help="Stop on first failure"
+    ),
     headed: bool = typer.Option(False, "--headed", help="Run with visible browser"),
-    debug: bool = typer.Option(False, "--debug", help="Run with Playwright Inspector (implies --headed)"),
+    debug: bool = typer.Option(
+        False, "--debug", help="Run with Playwright Inspector (implies --headed)"
+    ),
 ) -> None:
     """Run E2E browser tests."""
     runner = TestRunner(verbose=verbose)
-    success = runner.run_pytest(PYTEST_CONFIGS["e2e"], file_pattern=file, stop_on_first_failure=stop_on_first_failure, headed=headed, debug=debug)
+    success = runner.run_pytest(
+        PYTEST_CONFIGS["e2e"],
+        file_pattern=file,
+        stop_on_first_failure=stop_on_first_failure,
+        headed=headed,
+        debug=debug,
+    )
     _exit_on_failure(runner, success)
 
 
 @app.command()
 def python(
-    coverage: bool = typer.Option(False, "--coverage", "-c", help="Include coverage reporting"),
+    coverage: bool = typer.Option(
+        False, "--coverage", "-c", help="Include coverage reporting"
+    ),
     file: Optional[str] = typer.Option(None, "--file", help="Run specific test file"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
-    stop_on_first_failure: bool = typer.Option(False, "--stop-on-first-failure", "-x", help="Stop on first failure"),
+    stop_on_first_failure: bool = typer.Option(
+        False, "--stop-on-first-failure", "-x", help="Stop on first failure"
+    ),
 ) -> None:
     """Run all Python tests (unit + integration)."""
     runner = TestRunner(verbose=verbose)
-    success = runner.run_pytest(PYTEST_CONFIGS["python"], coverage=coverage, file_pattern=file, stop_on_first_failure=stop_on_first_failure)
+    success = runner.run_pytest(
+        PYTEST_CONFIGS["python"],
+        coverage=coverage,
+        file_pattern=file,
+        stop_on_first_failure=stop_on_first_failure,
+    )
     _exit_on_failure(runner, success)
 
 
@@ -338,7 +384,9 @@ def ty(
 @app.command()
 def cc(
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
-    max_complexity: int = typer.Option(10, "--max-complexity", "-m", help="Maximum allowed cyclomatic complexity"),
+    max_complexity: int = typer.Option(
+        10, "--max-complexity", "-m", help="Maximum allowed cyclomatic complexity"
+    ),
 ) -> None:
     """Run cyclomatic complexity analysis on src (excluding tests and ui)."""
     runner = TestRunner(verbose=verbose)
@@ -348,9 +396,13 @@ def cc(
 
 @app.command(name="all")
 def all_tests(
-    coverage: bool = typer.Option(False, "--coverage", "-c", help="Include coverage for Python tests"),
+    coverage: bool = typer.Option(
+        False, "--coverage", "-c", help="Include coverage for Python tests"
+    ),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
-    max_complexity: int = typer.Option(10, "--max-complexity", "-m", help="Maximum allowed cyclomatic complexity"),
+    max_complexity: int = typer.Option(
+        10, "--max-complexity", "-m", help="Maximum allowed cyclomatic complexity"
+    ),
 ) -> None:
     """Run all tests."""
     runner = TestRunner(verbose=verbose)

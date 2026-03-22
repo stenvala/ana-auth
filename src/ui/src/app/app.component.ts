@@ -1,13 +1,13 @@
-import { Component, computed, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { CoreNavService } from '@core/services/core-nav.service';
-import { CoreNavbarComponent } from '@core/components/core-navbar/core-navbar.component';
+import { Component, computed, inject } from "@angular/core";
+import { RouterOutlet } from "@angular/router";
+import { CoreNavService } from "@core/services/core-nav.service";
+import { CoreNavbarComponent } from "@core/components/core-navbar/core-navbar.component";
 
 @Component({
-  selector: 'app-root',
+  selector: "app-root",
   imports: [RouterOutlet, CoreNavbarComponent],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
+  templateUrl: "./app.component.html",
+  styleUrl: "./app.component.scss",
 })
 export class AppComponent {
   private readonly navService = inject(CoreNavService);

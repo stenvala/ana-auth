@@ -1,26 +1,26 @@
-@use '@angular/material' as mat;
-@use 'theme-colors' as theme;
+@use "@angular/material" as mat;
+@use "theme-colors" as theme;
 
 // Design System Partials
-@use 'styles/variables';
-@use 'styles/base';
-@use 'styles/layout';
-@use 'styles/pages';
-@use 'styles/components';
-@use 'styles/cards';
-@use 'styles/grids';
-@use 'styles/forms';
-@use 'styles/dialogs';
-@use 'styles/buttons';
-@use 'styles/alerts';
-@use 'styles/toolbar';
-@use 'styles/sections';
-@use 'styles/chips';
-@use 'styles/resize';
-@use 'styles/drag-drop';
-@use 'styles/material-overrides';
-@use 'styles/badges';
-@use 'styles/lists';
+@use "styles/variables";
+@use "styles/base";
+@use "styles/layout";
+@use "styles/pages";
+@use "styles/components";
+@use "styles/cards";
+@use "styles/grids";
+@use "styles/forms";
+@use "styles/dialogs";
+@use "styles/buttons";
+@use "styles/alerts";
+@use "styles/toolbar";
+@use "styles/sections";
+@use "styles/chips";
+@use "styles/resize";
+@use "styles/drag-drop";
+@use "styles/material-overrides";
+@use "styles/badges";
+@use "styles/lists";
 
 html {
   height: 100%;

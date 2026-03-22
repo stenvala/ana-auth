@@ -10,6 +10,7 @@ import uuid
 from pathlib import Path
 
 import psycopg2
+import psycopg2.extensions
 import pytest
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
@@ -21,7 +22,11 @@ PROJECT_ROOT = Path(__file__).resolve().parents[4]
 
 def _connect() -> psycopg2.extensions.connection:
     conn = psycopg2.connect(
-        host="localhost", port=5432, database="postgres", user="postgres", password="postgres"
+        host="localhost",
+        port=5432,
+        database="postgres",
+        user="postgres",
+        password="postgres",
     )
     conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
     return conn
@@ -82,7 +87,9 @@ def _run_setup_db(*args: str) -> subprocess.CompletedProcess[str]:
         text=True,
     )
     if result.returncode != 0:
-        raise RuntimeError(f"setup_db.py {' '.join(args)} failed:\n{result.stderr}\n{result.stdout}")
+        raise RuntimeError(
+            f"setup_db.py {' '.join(args)} failed:\n{result.stderr}\n{result.stdout}"
+        )
     return result
 
 
@@ -121,7 +128,9 @@ def test_create_schema_seeds_admin_user(test_suffix: str, schema_name: str) -> N
         cursor = conn.cursor()
         cursor.execute(f'SET search_path = "{schema_name}";')
 
-        cursor.execute("SELECT id, user_name FROM user_account WHERE user_name = 'stenvala';")
+        cursor.execute(
+            "SELECT id, user_name FROM user_account WHERE user_name = 'stenvala';"
+        )
         admin = cursor.fetchone()
         assert admin is not None, "Admin user 'stenvala' should exist"
 
@@ -150,7 +159,9 @@ def test_create_schema_is_idempotent(test_suffix: str, schema_name: str) -> None
         cursor = conn.cursor()
         cursor.execute(f'SET search_path = "{schema_name}";')
 
-        cursor.execute("SELECT COUNT(*) FROM user_account WHERE user_name = 'stenvala';")
+        cursor.execute(
+            "SELECT COUNT(*) FROM user_account WHERE user_name = 'stenvala';"
+        )
         count = cursor.fetchone()[0]
         assert count == 1, "Admin user should not be duplicated"
 

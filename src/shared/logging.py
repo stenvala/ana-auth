@@ -120,7 +120,7 @@ class ReadableFormatter(logging.Formatter):
             message = f"[{transaction_id}] {message}"
 
         if hasattr(record, "extra_fields"):
-            extra_fields = record.extra_fields
+            extra_fields: dict[str, Any] = record.extra_fields  # type: ignore[attr-defined]
             extra = " ".join(f"{k}={v}" for k, v in extra_fields.items())
             message = f"{message} | {extra}"
 
@@ -144,7 +144,7 @@ class StructuredLogger:
             (),
             None,
         )
-        record.extra_fields = kwargs  # type: ignore[attr-defined]
+        record.extra_fields = kwargs
         self._logger.handle(record)
 
     def info(self, message: str, **kwargs: Any) -> None:

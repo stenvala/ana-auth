@@ -32,7 +32,7 @@ def create_app() -> FastAPI:
         openapi_url="/api/openapi.json",
     )
 
-    app.add_middleware(ApiMiddleware)
+    app.add_middleware(ApiMiddleware)  # type: ignore[arg-type]
 
     app.include_router(health_router.router)
 

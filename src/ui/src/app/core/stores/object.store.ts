@@ -1,4 +1,4 @@
-import { Signal, signal, WritableSignal } from '@angular/core';
+import { Signal, signal, WritableSignal } from "@angular/core";
 
 export class ObjectStore<T> {
   private data: Record<string, WritableSignal<T | null>> = {};

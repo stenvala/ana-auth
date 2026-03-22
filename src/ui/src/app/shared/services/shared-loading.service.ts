@@ -1,7 +1,7 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed } from "@angular/core";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class SharedLoadingService {
   private readonly loadingCount = signal(0);

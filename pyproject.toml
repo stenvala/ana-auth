@@ -9,26 +9,21 @@ dependencies = [
     "fastapi>=0.116.1",
     "uvicorn[standard]>=0.32.0",
     "gunicorn>=23.0.0",
-
     # Database
     "sqlmodel>=0.0.22",
     "psycopg2-binary>=2.9.9",
-
     # Logging
     "structlog>=24.4.0",
-
     # CLI tools
     "typer>=0.16.1",
-
     # Authentication
     "bcrypt>=4.1.0",
-
     # Configuration
     "pyyaml>=6.0.2",
     "pydantic>=2.11.0",
-
     # Process management
     "psutil>=7.0.0",
+    "ty>=0.0.24",
 ]
 
 [tool.ruff]
@@ -41,6 +36,9 @@ extend-select = ["I"]
 [tool.ruff.lint.isort]
 force-single-line = false
 known-first-party = ["api", "shared"]
+
+[tool.ty.src]
+exclude = [".claude/", "output/", "test-artifacts/", "after_api_change.py"]
 
 [tool.coverage.run]
 source = ["src"]

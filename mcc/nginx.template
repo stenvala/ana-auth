@@ -1,0 +1,52 @@
+limit_req_zone $binary_remote_addr zone={{DOMAIN}}_limit:10m rate=10r/s;
+
+server {
+    listen 80;
+    server_name {{DOMAIN}};
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name {{DOMAIN}};
+
+    # SSL - managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/{{DOMAIN}}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{DOMAIN}}/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    # Security headers
+    add_header X-Frame-Options DENY always;
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy strict-origin-when-cross-origin always;
+
+    # API proxy
+    location /api/ {
+        limit_req zone={{DOMAIN}}_limit burst=20 nodelay;
+
+        proxy_pass http://127.0.0.1:{{API_PORT}};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Angular frontend
+    root {{UI_SYMLINK}}/browser;
+    index index.html;
+
+    # Assets - long cache with immutable
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    # SPA routing - no cache for index.html
+    location / {
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+        try_files $uri $uri/ /index.html;
+    }
+}

@@ -1,14 +1,14 @@
-import { Routes } from '@angular/router';
+import { Routes } from "@angular/router";
 
 export const routes: Routes = [
   {
-    path: '',
+    path: "",
     loadComponent: () =>
-      import('./features/landing/landing.component').then((m) => m.LandingComponent),
-    pathMatch: 'full',
+      import("./features/landing/landing.component").then((m) => m.LandingComponent),
+    pathMatch: "full",
   },
   {
-    path: '**',
-    redirectTo: '',
+    path: "**",
+    redirectTo: "",
   },
 ];

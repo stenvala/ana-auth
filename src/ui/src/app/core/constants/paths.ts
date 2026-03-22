@@ -8,11 +8,11 @@
  */
 export const PATHS = {
   PUBLIC: {
-    LANDING: '',
+    LANDING: "",
   },
   AUTH: {
-    LOGIN: '/login',
-    DASHBOARD: '/dashboard',
+    LOGIN: "/login",
+    DASHBOARD: "/dashboard",
   },
   // TODO: Add your feature paths here
 };

@@ -1,0 +1,27 @@
+[Unit]
+Description=ana-auth API ({{STAGE}})
+After=network.target
+
+[Service]
+User=www-data
+Group=stenvala
+WorkingDirectory={{API_SYMLINK}}
+ExecStart={{REMOTE_BASE}}/.venv/bin/gunicorn api.main:app \
+    --workers {{WORKERS}} \
+    --worker-class uvicorn.workers.UvicornWorker \
+    --bind 127.0.0.1:{{API_PORT}} \
+    --access-logfile {{LOG_ROOT}}/access.log \
+    --error-logfile {{LOG_ROOT}}/error.log
+Environment="SCHEMA_SUFFIX={{DB_SCHEMA_SUFFIX}}"
+Environment="LOG_ROOT={{LOG_ROOT}}"
+Environment="ENV_TYPE=PROD"
+Environment="STAGE={{STAGE}}"
+Environment="DB_HOST={{DB_HOST}}"
+Environment="DB_PORT={{DB_PORT}}"
+Environment="DB_USER={{DB_USER}}"
+Environment="DB_PASSWORD={{DB_PASSWORD}}"
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

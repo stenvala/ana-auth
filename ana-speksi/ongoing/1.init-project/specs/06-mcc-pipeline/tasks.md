@@ -22,7 +22,7 @@ Create the `mcc/` directory for stage configs and infrastructure templates.
 Files:
 - Create `mcc/` directory
 
-- [ ] P01.T001
+- [x] P01.T001
 
 ---
 
@@ -42,7 +42,7 @@ Create `mcc_common.py` at project root with:
 Files:
 - Create `mcc_common.py`
 
-- [ ] P02.T001
+- [x] P02.T001
 
 ### P02.T002 -- Create mcc_config.py
 
@@ -56,7 +56,7 @@ Create `mcc_config.py` at project root with:
 Files:
 - Create `mcc_config.py`
 
-- [ ] P02.T002
+- [x] P02.T002
 
 ### P02.T003 -- Create stage configuration files
 
@@ -70,7 +70,7 @@ Files:
 - Create `mcc/conf-prod.yml`
 - Create `mcc/conf-dev.yml`
 
-- [ ] P02.T003
+- [x] P02.T003
 
 ### P02.T004 -- Create lint.py
 
@@ -86,7 +86,7 @@ Files:
 
 Verify: `uv run lint.py python` runs without error.
 
-- [ ] P02.T004
+- [x] P02.T004
 
 ### P02.T005 -- Create start_services.py
 
@@ -102,7 +102,7 @@ Create `start_services.py` at project root modeled after accounts/start_services
 Files:
 - Create `start_services.py`
 
-- [ ] P02.T005
+- [x] P02.T005
 
 ### P02.T006 -- Create after_api_change.py placeholder
 
@@ -113,7 +113,7 @@ Create `after_api_change.py` at project root as a placeholder for future fronten
 Files:
 - Create `after_api_change.py`
 
-- [ ] P02.T006
+- [x] P02.T006
 
 ### P02.T007 -- Create mcc_build.py
 
@@ -133,7 +133,7 @@ Files:
 
 Verify: `uv run mcc_build.py --no-tests` completes and creates output directory.
 
-- [ ] P02.T007
+- [x] P02.T007
 
 ### P02.T008 -- Create mcc_deploy.py
 
@@ -158,7 +158,7 @@ Create `mcc_deploy.py` at project root:
 Files:
 - Create `mcc_deploy.py`
 
-- [ ] P02.T008
+- [x] P02.T008
 
 ### P02.T009 -- Create systemd service template
 
@@ -173,7 +173,7 @@ Create `mcc/daemon.template` with `{{PLACEHOLDER}}` syntax:
 Files:
 - Create `mcc/daemon.template`
 
-- [ ] P02.T009
+- [x] P02.T009
 
 ### P02.T010 -- Create nginx config template
 
@@ -191,7 +191,7 @@ Create `mcc/nginx.template` with `{{PLACEHOLDER}}` syntax:
 Files:
 - Create `mcc/nginx.template`
 
-- [ ] P02.T010
+- [x] P02.T010
 
 ### P02.T011 -- Create deploy_server.py
 
@@ -209,7 +209,7 @@ Create `mcc/deploy_server.py` modeled after accounts:
 Files:
 - Create `mcc/deploy_server.py`
 
-- [ ] P02.T011
+- [x] P02.T011
 
 ### P02.T012 -- Copy ensure_admin.sql to MCC directory
 
@@ -220,7 +220,7 @@ Copy or symlink the ensure_admin.sql to `mcc/ensure_admin.sql` so the deploy scr
 Files:
 - Create `mcc/ensure_admin.sql` (or symlink to `src/shared/db/schema/ensure_admin.sql`)
 
-- [ ] P02.T012
+- [x] P02.T012
 
 ---
 
@@ -242,7 +242,7 @@ Files:
 
 Verify: `uv run pytest src/tests/unit/test_mcc_config.py -v` passes.
 
-- [ ] P03.T001
+- [x] P03.T001
 
 ---
 

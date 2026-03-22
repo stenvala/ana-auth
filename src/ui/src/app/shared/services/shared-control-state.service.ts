@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: "root" })
 export class SharedControlStateService {
-  private readonly STORAGE_PREFIX = 'control_state_';
+  private readonly STORAGE_PREFIX = "control_state_";
 
   save<T>(key: string, value: T): void {
     try {

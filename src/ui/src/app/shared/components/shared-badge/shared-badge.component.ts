@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, input } from "@angular/core";
+import { CommonModule } from "@angular/common";
 
 /**
  * Shared badge component for consistent badge styling across the application.
@@ -11,11 +11,11 @@ import { CommonModule } from '@angular/common';
  * <shared-badge [customColor]="stage.color" [value]="stage.name" />
  */
 @Component({
-  selector: 'shared-badge',
+  selector: "shared-badge",
 
   imports: [CommonModule],
-  templateUrl: './shared-badge.component.html',
-  styleUrl: './shared-badge.component.scss',
+  templateUrl: "./shared-badge.component.html",
+  styleUrl: "./shared-badge.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SharedBadgeComponent {
@@ -23,11 +23,11 @@ export class SharedBadgeComponent {
   readonly badgeClass = input<string>();
   readonly customColor = input<string>();
   readonly value = input.required<string>();
-  readonly size = input<'sm' | 'md' | 'lg'>('md');
+  readonly size = input<"sm" | "md" | "lg">("md");
   readonly showDot = input<boolean>(false);
 
   protected readonly badgeClasses = computed(() => {
-    const classes: string[] = ['shared-badge'];
+    const classes: string[] = ["shared-badge"];
 
     const colorValue = this.color() || this.badgeClass();
 
@@ -36,10 +36,10 @@ export class SharedBadgeComponent {
     }
 
     const sizeValue = this.size();
-    if (sizeValue !== 'md') {
+    if (sizeValue !== "md") {
       classes.push(`shared-badge--${sizeValue}`);
     }
 
-    return classes.join(' ');
+    return classes.join(" ");
   });
 }

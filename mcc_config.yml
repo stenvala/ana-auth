@@ -1,0 +1,21 @@
+deploy:
+  prod:
+    allow_branches: "^main$"
+    auto_branches: "^main$"
+    parameters:
+      conf: conf-prod.yml
+      deployment_timestamp: true
+      keep_builds: 10
+  dev:
+    allow_branches: ".*"
+    auto_branches: ".*"
+    parameters:
+      conf: conf-dev.yml
+      deployment_timestamp: true
+      keep_builds: 5
+  clone-prod-to-dev:
+    allow_branches: ".*"
+    auto_branches: "-"
+    parameters:
+      conf-source: conf-prod.yml
+      conf-target: conf-dev.yml

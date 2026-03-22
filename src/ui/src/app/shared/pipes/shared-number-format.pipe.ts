@@ -1,8 +1,8 @@
-import { Pipe, PipeTransform, inject } from '@angular/core';
-import { SharedLocaleService } from '../services/shared-locale.service';
+import { Pipe, PipeTransform, inject } from "@angular/core";
+import { SharedLocaleService } from "../services/shared-locale.service";
 
 @Pipe({
-  name: 'sharedNumberFormat',
+  name: "sharedNumberFormat",
 })
 export class SharedNumberFormatPipe implements PipeTransform {
   private readonly locale = inject(SharedLocaleService);

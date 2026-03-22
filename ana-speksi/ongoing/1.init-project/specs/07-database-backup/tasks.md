@@ -36,7 +36,7 @@ Create `backup_db.py` at project root:
 Files:
 - Create `backup_db.py`
 
-- [ ] P02.T001
+- [x] P02.T001
 
 ### P02.T002 -- Implement retention cleanup in backup_db.py
 
@@ -53,7 +53,7 @@ Add retention cleanup logic to backup_db.py:
 Files:
 - Modify `backup_db.py`
 
-- [ ] P02.T002
+- [x] P02.T002
 
 ### P02.T003 -- Add cron job config to prod stage YAML
 
@@ -66,7 +66,7 @@ Add CRON_JOBS configuration to `mcc/conf-prod.yml`:
 Files:
 - Modify `mcc/conf-prod.yml`
 
-- [ ] P02.T003
+- [x] P02.T003
 
 ---
 
@@ -89,7 +89,7 @@ Files:
 
 Verify: `uv run pytest src/tests/unit/test_backup_db.py -v` passes.
 
-- [ ] P03.T001
+- [x] P03.T001
 
 ---
 

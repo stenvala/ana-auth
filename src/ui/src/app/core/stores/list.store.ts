@@ -1,4 +1,4 @@
-import { computed, Signal, signal, WritableSignal } from '@angular/core';
+import { computed, Signal, signal, WritableSignal } from "@angular/core";
 
 interface ObjectWithId {
   id: string;

@@ -36,5 +36,5 @@ test-screenshots/**/*.mp4
 #todos/*.md
 openapi.json
 google-oauth-secrets.json
-
+test-artifacts
 output

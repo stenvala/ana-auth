@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 import psycopg2
+import psycopg2.extensions
 import typer
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 

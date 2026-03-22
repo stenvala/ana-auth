@@ -1,6 +1,6 @@
-import { Signal } from '@angular/core';
-import { ListStore } from './list.store';
-import { ObjectStore } from './object.store';
+import { Signal } from "@angular/core";
+import { ListStore } from "./list.store";
+import { ObjectStore } from "./object.store";
 
 interface ObjectWithId {
   id: string;
