@@ -73,7 +73,7 @@ def run_integration_tests() -> None:
     """Run integration tests."""
     print("\n=== INTEGRATION TESTS ===")
     run(["uv", "run", "run_tests.py", "int"])
-    for artifact in PROJECT_ROOT.glob("pytest-integration-*.xml"):
+    for artifact in PROJECT_ROOT.glob("integation-*.xml"):
         shutil.copy2(artifact, TEST_ARTIFACTS_DIR)
 
 

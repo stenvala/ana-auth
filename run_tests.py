@@ -23,7 +23,7 @@ class PytestConfig:
     ignore_e2e: bool = True
     parallel: bool = True
     default_path: str = "tests/"
-    junit_xml: str = "pytest-report.xml"
+    junit_xml: str = "unit-test.xml"
     cov_fail_under: Optional[int] = COV_FAIL_UNDER
     suite_name: str = ""
     headed: bool = False
@@ -38,7 +38,7 @@ PYTEST_CONFIGS = {
     "integration": PytestConfig(
         marker="integration",
         parallel=False,
-        junit_xml="pytest-integration-report.xml",
+        junit_xml="integation-tests.xml",
         cov_fail_under=None,
         suite_name="Python Integration Tests",
     ),
@@ -46,7 +46,7 @@ PYTEST_CONFIGS = {
         marker="e2e",
         ignore_e2e=False,
         default_path="tests/e2e/",
-        junit_xml="pytest-e2e-report.xml",
+        junit_xml="e2e-tests.xml",
         cov_fail_under=None,
         suite_name="E2E Browser Tests",
     ),

@@ -226,7 +226,7 @@ def run_unit_tests(self, coverage: bool = False):
                "--ignore=tests/e2e", "tests/", "-v"]
 
     # JUnit XML output — always write when test-artifacts/ exists
-    junit_path = "../test-artifacts/unit-tests.xml" if self.has_artifacts_dir else "../pytest-report.xml"
+    junit_path = "../test-artifacts/unit-tests.xml" if self.has_artifacts_dir else "../unit-tests.xml"
     command.extend([f"--junit-xml={junit_path}"])
 
     # Coverage JSON — only when coverage is enabled AND test-artifacts/ exists
@@ -247,7 +247,7 @@ def run_integration_tests(self):
     command = ["uv", "run", "pytest", "-m", "integration",
                "--ignore=tests/e2e", "tests/", "-v"]
 
-    junit_path = "../test-artifacts/integration-tests.xml" if self.has_artifacts_dir else "../pytest-integration-report.xml"
+    junit_path = "../test-artifacts/integration-tests.xml" if self.has_artifacts_dir else "../integation-tests.xml"
     command.extend([f"--junit-xml={junit_path}"])
 
     self.run_command(command, cwd=self.src_dir, description="Python integration tests")

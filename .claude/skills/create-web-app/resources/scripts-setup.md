@@ -439,7 +439,7 @@ class TestRunner:
         command.append("-v")
 
         # Add junit output for CI
-        command.extend(["--junit-xml=../pytest-report.xml"])
+        command.extend(["--junit-xml=../unit-tests.xml"])
 
         success, _ = self.run_command(
             command, cwd=self.src_dir, description="Python unit tests"
@@ -489,7 +489,7 @@ class TestRunner:
         command.append("-v")
 
         # Add junit output for CI
-        command.extend(["--junit-xml=../pytest-integration-report.xml"])
+        command.extend(["--junit-xml=../integation-tests.xml"])
 
         success, _ = self.run_command(
             command, cwd=self.src_dir, description="Python integration tests"
@@ -525,7 +525,7 @@ class TestRunner:
             command.append("tests/e2e/")
 
         command.append("-v")
-        command.extend(["--junit-xml=../pytest-e2e-report.xml"])
+        command.extend(["--junit-xml=../e2e-tests.xml"])
 
         if headed or debug:
             command.append("--headed")
@@ -584,7 +584,7 @@ class TestRunner:
         command.append("-v")
 
         # Add junit output for CI
-        command.extend(["--junit-xml=../pytest-report.xml"])
+        command.extend(["--junit-xml=../unit-tests.xml"])
 
         success, _ = self.run_command(
             command, cwd=self.src_dir, description="Python tests"

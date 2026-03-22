@@ -10,7 +10,7 @@ wheels/
 .venv
 *.log
 coverage.xml
-pytest-report.xml
+unit-tests.xml
 htmlcov
 node_modules
 playwright-report
@@ -24,7 +24,7 @@ playwright-junit.xml
 dist
 .mypy_cache
 .pytest_cache
-pytest-e2e-report.xml
+e2e-tests.xml
 .DS_Store
 logs
 debug_*.png
@@ -38,3 +38,5 @@ openapi.json
 google-oauth-secrets.json
 test-artifacts
 output
+*-report.xml
+*-tests.xml
