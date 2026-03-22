@@ -24,6 +24,7 @@ dependencies = [
     # Process management
     "psutil>=7.0.0",
     "ty>=0.0.24",
+    "fabric>=3.2.2",
 ]
 
 [tool.ruff]

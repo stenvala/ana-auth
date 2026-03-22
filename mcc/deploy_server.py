@@ -1,147 +1,226 @@
 #!/usr/bin/env python3
-"""Server infrastructure setup for ana-auth.
+"""Initial server setup for ana-auth.
 
-Renders templates and deploys systemd/nginx configs via SSH.
-Run from local machine to set up both prod and dev stages.
+Uploads systemd services and nginx configurations via Fabric/SSH.
+Handles SSL certificate generation via Certbot.
+Deploys both prod and dev staging areas in one run.
 """
 
-import subprocess
+import re
 import sys
+import time
+from getpass import getpass
 from pathlib import Path
+
+from fabric import Connection
+from invoke import UnexpectedExit
 
 MCC_DIR = Path(__file__).parent
 PROJECT_ROOT = MCC_DIR.parent
-
-# Add project root to path for imports
 sys.path.insert(0, str(PROJECT_ROOT))
 from mcc_config import load_config
 
 
-def render_template(template_path: Path, config: dict[str, str]) -> str:
-    """Replace {{KEY}} placeholders in a template with config values."""
+def make_domain_safe(domain: str) -> str:
+    """Convert domain to safe identifier for nginx configs."""
+    return re.sub(r"[^a-zA-Z0-9]", "_", domain)
+
+
+def render_template(template_path: Path, replacements: dict[str, str]) -> str:
+    """Render template with {{KEY}} style replacements."""
     content = template_path.read_text()
-    for key, value in config.items():
+    for key, value in replacements.items():
         content = content.replace(f"{{{{{key}}}}}", value)
     return content
 
 
-def _ssh_run(config: dict[str, str], cmd: str) -> None:
-    """Run a command on the remote server via SSH."""
-    remote = f"{config['REMOTE_USER']}@{config['REMOTE_HOST']}"
-    print(f"SSH: {cmd}")
-    subprocess.run(["ssh", remote, cmd], check=True)
-
-
-def _upload_file(config: dict[str, str], content: str, remote_path: str) -> None:
-    """Upload content to a file on the remote server."""
-    remote = f"{config['REMOTE_USER']}@{config['REMOTE_HOST']}"
-    print(f"Uploading: {remote_path}")
-    subprocess.run(
-        ["ssh", remote, f"cat > /tmp/_mcc_upload"],
-        input=content,
-        text=True,
-        check=True,
-    )
-    subprocess.run(
-        ["ssh", remote, f"sudo mv /tmp/_mcc_upload {remote_path}"],
-        check=True,
-    )
-
-
 def generate_service_config(config: dict[str, str]) -> str:
-    """Render the systemd service template for a stage."""
+    """Generate systemd service configuration from daemon.template."""
     template = MCC_DIR / "daemon.template"
     return render_template(template, config)
 
 
 def generate_nginx_config(config: dict[str, str]) -> str:
-    """Render the nginx config template for a stage."""
+    """Generate nginx configuration from nginx.template."""
     template = MCC_DIR / "nginx.template"
-    return render_template(template, config)
+    replacements = dict(config)
+    replacements["DOMAIN_SAFE"] = make_domain_safe(config["DOMAIN"])
+    return render_template(template, replacements)
 
 
-def upload_configuration_files(config: dict[str, str]) -> None:
-    """Upload systemd and nginx configs to the remote server."""
-    service_name = config["SERVICE_NAME"]
-    domain = config["DOMAIN"]
+def get_connection() -> Connection:
+    """Get SSH connection with sudo password using prod configuration."""
+    config = load_config("prod", config_dir=MCC_DIR)
+    remote_user = config["REMOTE_USER"]
+    remote_host = config["REMOTE_HOST"]
 
-    # Upload systemd service
-    service_content = generate_service_config(config)
-    _upload_file(
-        config,
-        service_content,
-        f"/etc/systemd/system/{service_name}",
+    print(f"---- REQUEST PASSWORD FOR {remote_user} AT {remote_host} ----")
+    password = getpass("Enter sudo password: ")
+    c = Connection(
+        f"{remote_user}@{remote_host}", connect_kwargs={"password": password}
     )
-
-    # Upload nginx config
-    nginx_content = generate_nginx_config(config)
-    _upload_file(
-        config,
-        nginx_content,
-        f"/etc/nginx/sites-available/{domain}",
-    )
+    c.config.sudo.password = password
+    return c
 
 
-def setup_backend_daemons(config: dict[str, str]) -> None:
-    """Enable and restart the systemd service."""
-    service_name = config["SERVICE_NAME"]
-    _ssh_run(config, f"sudo systemctl daemon-reload")
-    _ssh_run(config, f"sudo systemctl enable {service_name}")
-    _ssh_run(config, f"sudo systemctl restart {service_name}")
-    print(f"Service {service_name} enabled and restarted.")
+def upload_configuration_files(
+    c: Connection, configs: list[dict[str, str]]
+) -> None:
+    """Upload systemd service and nginx configuration files."""
+    remote_user = configs[0]["REMOTE_USER"]
+
+    print("Uploading configuration files...")
+
+    for config in configs:
+        service_name = config["SERVICE_NAME"]
+        domain = config["DOMAIN"]
+
+        # Generate and upload systemd service file
+        print(f"Generating daemon config for {service_name}...")
+        service_content = generate_service_config(config)
+        tmp_service_file = MCC_DIR / f"{service_name}.tmp"
+        tmp_service_file.write_text(service_content)
+
+        remote_path = f"/home/{remote_user}/{service_name}"
+        print(f"Uploading {service_name} to {remote_path}...")
+        c.put(str(tmp_service_file), remote_path)
+        tmp_service_file.unlink()
+
+        c.sudo(f"mv -f {remote_path} /etc/systemd/system/", echo=True)
+        c.sudo(f"chown root:root /etc/systemd/system/{service_name}", echo=True)
+        c.sudo(f"chmod 644 /etc/systemd/system/{service_name}", echo=True)
+
+        # Generate and upload nginx config
+        print(f"Generating nginx config for {domain}...")
+        nginx_content = generate_nginx_config(config)
+        tmp_file = MCC_DIR / f"{domain}.tmp"
+        tmp_file.write_text(nginx_content)
+
+        remote_path = f"/home/{remote_user}/{domain}"
+        print(f"Uploading {domain} to {remote_path}...")
+        c.put(str(tmp_file), remote_path)
+        tmp_file.unlink()
+
+        c.sudo(f"mv -f {remote_path} /etc/nginx/sites-available/", echo=True)
+        c.sudo(f"chown root:root /etc/nginx/sites-available/{domain}", echo=True)
 
 
-def setup_nginx(config: dict[str, str]) -> None:
-    """Set up nginx with SSL via certbot."""
-    domain = config["DOMAIN"]
+def setup_backend_daemons(
+    c: Connection, configs: list[dict[str, str]]
+) -> None:
+    """Set up and start all backend systemd services."""
+    print("Reloading systemd daemon...")
+    c.sudo("/bin/systemctl daemon-reload", echo=True)
 
-    # Create symlink in sites-enabled
-    _ssh_run(
-        config,
-        f"sudo ln -sf /etc/nginx/sites-available/{domain} /etc/nginx/sites-enabled/{domain}",
-    )
+    for config in configs:
+        service_name = config["SERVICE_NAME"]
+        print(f"\nEnabling and starting {service_name}...")
+        c.sudo(f"/bin/systemctl enable {service_name}", echo=True)
+        c.sudo(f"/bin/systemctl restart {service_name}", echo=True)
+        print(f"Wait 5 seconds and check {service_name} status...")
+        time.sleep(5)
+        c.sudo(f"/bin/systemctl status {service_name}", echo=True)
 
-    # Test nginx config
-    _ssh_run(config, "sudo nginx -t")
-
-    # Check if SSL cert exists; if not, obtain one
-    _ssh_run(
-        config,
-        f'test -d /etc/letsencrypt/live/{domain} || sudo certbot certonly --standalone -d {domain} --non-interactive --agree-tos --email admin@{domain.split(".", 1)[1] if "." in domain else domain}',
-    )
-
-    # Restart nginx
-    _ssh_run(config, "sudo systemctl restart nginx")
-    print(f"Nginx configured for {domain}.")
+        print(f"Recent logs for {service_name}:")
+        c.sudo(
+            f"/usr/bin/journalctl -u {service_name} -n 10 --no-pager", echo=True
+        )
 
 
-def setup_stage(stage: str) -> None:
-    """Full infrastructure setup for a single stage."""
-    config = load_config(stage, config_dir=MCC_DIR)
-    print(f"\n{'=' * 40}")
-    print(f"SETTING UP: {stage} ({config['DOMAIN']})")
-    print(f"{'=' * 40}")
+def setup_nginx(c: Connection, configs: list[dict[str, str]]) -> None:
+    """Set up nginx configuration and SSL certificates."""
+    for config in configs:
+        domain = config["DOMAIN"]
+        email = config.get("EMAIL", f"admin@{domain}")
+
+        print(f"\n---- Setting up nginx for {domain} ----")
+
+        # Check if SSL certificates already exist
+        cert_exists = False
+        try:
+            c.run(f"ls /etc/letsencrypt/live/{domain}/fullchain.pem", hide=True)
+            cert_exists = True
+            print("SSL certificates already exist")
+        except UnexpectedExit:
+            print("SSL certificates do not exist, will generate them")
+
+        if not cert_exists:
+            print(
+                "First-time deployment: generating SSL certificates with standalone mode..."
+            )
+            c.sudo("/bin/systemctl stop nginx", warn=True, echo=True)
+
+            try:
+                c.sudo(
+                    f"certbot certonly --standalone -d {domain} "
+                    f"--non-interactive --agree-tos -m {email}",
+                    echo=True,
+                )
+                print("SSL certificates generated successfully")
+            except UnexpectedExit as e:
+                print(f"Error: Certbot failed: {e}")
+                print(f"Cannot proceed without SSL certificates for {domain}")
+                continue
+
+        print("Ensuring nginx symlink exists...")
+        try:
+            c.sudo(
+                f"ln -sfn /etc/nginx/sites-available/{domain} /etc/nginx/sites-enabled/{domain}",
+                echo=True,
+            )
+        except UnexpectedExit as e:
+            print(f"Warning: Could not create symlink: {e}")
+
+    print("\nTesting and starting nginx...")
+    try:
+        c.sudo("nginx -t", echo=True)
+        c.sudo("/bin/systemctl restart nginx", echo=True)
+        print("Nginx started successfully with SSL")
+    except UnexpectedExit as e:
+        print(f"Error: Nginx failed to start: {e}")
+        print("Check nginx configuration and SSL certificate paths")
+        return
+
+    # Renew certificates for domains that had existing certs
+    for config in configs:
+        domain = config["DOMAIN"]
+        email = config.get("EMAIL", f"admin@{domain}")
+        try:
+            c.run(f"ls /etc/letsencrypt/live/{domain}/fullchain.pem", hide=True)
+            print(f"Renewing SSL certificates for {domain} using nginx plugin...")
+            try:
+                c.sudo(
+                    f"certbot certonly --nginx -d {domain} "
+                    f"--non-interactive --agree-tos -m {email}",
+                    warn=True,
+                    echo=True,
+                )
+            except UnexpectedExit:
+                print(
+                    f"Certificate renewal not needed for {domain} (this is usually OK)"
+                )
+        except UnexpectedExit:
+            pass
+
+
+def main(c: Connection) -> None:
+    """Main server setup orchestration for both prod and dev staging areas."""
+    prod_config = load_config("prod", config_dir=MCC_DIR)
+    dev_config = load_config("dev", config_dir=MCC_DIR)
+    configs = [prod_config, dev_config]
+
+    print("---- START SERVER SETUP ----")
 
     # Ensure base directories exist
-    _ssh_run(config, f"mkdir -p {config['REMOTE_BASE']}/logs")
+    for config in configs:
+        c.run(f"mkdir -p {config['REMOTE_BASE']}/logs", echo=True)
+        c.run(f"mkdir -p {config['REMOTE_BASE']}/backup", echo=True)
 
-    upload_configuration_files(config)
-    setup_backend_daemons(config)
-    setup_nginx(config)
-
-    print(f"\nInfrastructure setup complete for {stage}.")
-
-
-def main() -> None:
-    """Set up server infrastructure for both prod and dev stages."""
-    print("ana-auth server infrastructure setup")
-    print("=" * 40)
-
-    for stage in ["prod", "dev"]:
-        setup_stage(stage)
-
-    print("\n\nAll stages configured successfully.")
+    upload_configuration_files(c, configs)
+    setup_nginx(c, configs)
+    setup_backend_daemons(c, configs)
+    print("---- SERVER SETUP FINISHED ----")
 
 
 if __name__ == "__main__":
-    main()
+    main(get_connection())

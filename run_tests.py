@@ -23,7 +23,7 @@ class PytestConfig:
     ignore_e2e: bool = True
     parallel: bool = True
     default_path: str = "tests/"
-    junit_xml: str = "unit-test.xml"
+    junit_xml: str = "unit-tests.xml"
     cov_fail_under: Optional[int] = COV_FAIL_UNDER
     suite_name: str = ""
     headed: bool = False

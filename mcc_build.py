@@ -121,6 +121,8 @@ def assemble_output() -> None:
         "mcc_config.py",
         "setup_db.py",
         "backup_db.py",
+        "pyproject.toml",
+        "uv.lock",
     ]:
         src = PROJECT_ROOT / script
         shutil.copy2(src, OUTPUT_DIR / script)
@@ -143,7 +145,6 @@ def assemble_output() -> None:
     build_info = PROJECT_ROOT / "build_info.yml"
     if build_info.exists():
         shutil.copy2(build_info, OUTPUT_DIR / "build_info.yml")
-
     print(f"Output assembled in {OUTPUT_DIR}")
 
 

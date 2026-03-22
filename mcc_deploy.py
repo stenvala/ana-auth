@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
-"""MCC deploy script for ana-auth.
+"""Deployment script for ana-auth.
 
-Runs on the remote server from within the output/ directory.
-Handles versioned deployments, database setup, and service management.
+Handles symlink-based versioned deployments for API and UI.
+Runs on the remote server after CI/CD transfers the build output.
+
+Usage:
+  uv run mcc_deploy.py --stage prod
+
+Exit Code:
+  0 - Deployment succeeded
+  1 - Deployment failed
 """
 
-import hashlib
 import os
 import shutil
 import subprocess
@@ -14,207 +20,145 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-import psycopg2
-import psycopg2.extensions
 import typer
-from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+import yaml
 
 from mcc_common import run
-from mcc_config import load_config
-
-app = typer.Typer(help="Deploy ana-auth to remote server")
 
 PROJECT_NAME = "ana-auth"
-DEPLOY_DIR = Path(__file__).parent
 CRON_MARKER = "MCC-AUTH"
 
 
-def _get_config(stage: str) -> dict[str, str]:
-    """Load stage configuration."""
-    return load_config(stage, config_dir=DEPLOY_DIR / "mcc")
+def load_conf(cwd: Path, conf_file: str = "conf.yml") -> dict:
+    """Load deployment configuration from the given conf file."""
+    conf_path = cwd / conf_file
+    if not conf_path.exists():
+        raise FileNotFoundError(f"{conf_file} not found in {cwd}")
+    raw = yaml.safe_load(conf_path.read_text())
+
+    # Resolve {{REMOTE_BASE}} templates
+    remote_base = raw.get("REMOTE_BASE", "")
+    resolved = {}
+    for key, value in raw.items():
+        if isinstance(value, str):
+            resolved[key] = value.replace("{{REMOTE_BASE}}", remote_base)
+        else:
+            resolved[key] = value
+    return resolved
 
 
-def _connect_db(config: dict[str, str]) -> psycopg2.extensions.connection:
-    """Connect to PostgreSQL using stage config."""
-    return psycopg2.connect(
-        host=config["DB_HOST"],
-        port=int(config["DB_PORT"]),
-        database=config.get("DB_NAME", "postgres"),
-        user=config["DB_USER"],
-        password=config["DB_PASSWORD"],
+def cleanup_old_versions(base_dir: Path, keep_count: int) -> None:
+    """Clean up old version directories, keeping only N most recent."""
+    dirs = sorted(
+        [d for d in base_dir.iterdir() if d.is_dir() and d.name.startswith("vrs-")],
+        key=lambda p: p.name,
+        reverse=True,
     )
+    for old_dir in dirs[keep_count:]:
+        print(f"Removing old version: {old_dir.name}", flush=True)
+        shutil.rmtree(old_dir)
 
 
-def _create_versioned_dir(config: dict[str, str]) -> Path:
-    """Create a versioned deployment directory."""
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
-    vrs_dir = Path(config["REMOTE_BASE"]) / f"vrs-{timestamp}"
-    vrs_dir.mkdir(parents=True)
-    print(f"Created version directory: {vrs_dir}")
-    return vrs_dir
+def copy_api_files(cwd: Path, version_dir: Path) -> None:
+    """Copy API and shared source to the version directory."""
+    shutil.copytree(cwd / "src" / "api", version_dir / "api")
+    print("Copied api/", flush=True)
+
+    shutil.copytree(cwd / "src" / "shared", version_dir / "shared")
+    print("Copied shared/", flush=True)
 
 
-def _deploy_files(vrs_dir: Path) -> None:
-    """Copy API and UI files to the versioned directory."""
-    # API source
-    api_src = DEPLOY_DIR / "src"
-    if api_src.exists():
-        shutil.copytree(api_src, vrs_dir / "src", dirs_exist_ok=True)
-
-    # UI dist
-    ui_dist = DEPLOY_DIR / "ui-dist"
-    if ui_dist.exists():
-        shutil.copytree(ui_dist, vrs_dir / "ui-dist", dirs_exist_ok=True)
-
-    # pyproject.toml and uv.lock for venv sync
-    for f in ["pyproject.toml", "uv.lock"]:
-        src = DEPLOY_DIR / f
-        if src.exists():
-            shutil.copy2(src, vrs_dir / f)
-
-    print(f"Files deployed to {vrs_dir}")
-
-
-def _sync_venv(config: dict[str, str]) -> None:
-    """Sync virtual environment in the deployment base."""
-    base = Path(config["REMOTE_BASE"])
-    venv_path = base / ".venv"
-    if not venv_path.exists():
-        run(["uv", "venv", str(venv_path)])
-    run(["uv", "sync", "--frozen"], cwd=str(base))
-
-
-def _setup_database(config: dict[str, str]) -> None:
-    """Create schema if not exists and apply migrations."""
-    schema_name = f"{PROJECT_NAME}-{config['DB_SCHEMA_SUFFIX']}"
-    print(f"\nSetting up database schema: {schema_name}")
-
-    conn = _connect_db(config)
-    try:
-        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-        cursor = conn.cursor()
-
-        # Create schema if not exists
-        cursor.execute(f'CREATE SCHEMA IF NOT EXISTS "{schema_name}";')
-
-        # Create deployment log table
-        cursor.execute(f'SET search_path = "{schema_name}";')
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS _deployment_log (
-                id SERIAL PRIMARY KEY,
-                filename VARCHAR(255) NOT NULL UNIQUE,
-                checksum VARCHAR(255) NOT NULL,
-                applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-            );
-        """
-        )
-
-        # Apply schema creation SQL (checksum-tracked)
-        schema_sql = DEPLOY_DIR / "db" / "schema" / "create_schema.sql"
-        if schema_sql.exists():
-            _apply_sql_if_changed(cursor, schema_name, schema_sql, "create_schema.sql")
-
-        # Apply migrations
-        migrations_dir = DEPLOY_DIR / "db" / "migrations"
-        if migrations_dir.exists():
-            for migration in sorted(migrations_dir.glob("*.sql")):
-                _apply_sql_if_changed(cursor, schema_name, migration, migration.name)
-
-        cursor.close()
-        print("Database setup complete.")
-    except psycopg2.Error as e:
-        print(f"Database setup error: {e}")
-        sys.exit(1)
-    finally:
-        conn.close()
-
-
-def _apply_sql_if_changed(
-    cursor, schema_name: str, sql_path: Path, filename: str
-) -> None:
-    """Apply SQL file if its checksum has changed."""
-    content = sql_path.read_text()
-    checksum = hashlib.sha256(content.encode()).hexdigest()
-
-    cursor.execute(f'SET search_path = "{schema_name}";')
-    cursor.execute(
-        "SELECT checksum FROM _deployment_log WHERE filename = %s;",
-        (filename,),
-    )
-    row = cursor.fetchone()
-
-    if row and row[0] == checksum:
-        print(f"  {filename}: already up to date (skipped)")
-        return
-
-    print(f"  {filename}: applying...")
-    cursor.execute(f'SET search_path = "{schema_name}";')
-    cursor.execute(content)
-
-    if row:
-        cursor.execute(
-            "UPDATE _deployment_log SET checksum = %s, applied_at = CURRENT_TIMESTAMP WHERE filename = %s;",
-            (checksum, filename),
-        )
+def copy_ui_files(cwd: Path, version_dir: Path) -> None:
+    """Copy UI build contents into the version directory."""
+    ui_src = cwd / "ui-dist"
+    if ui_src.exists():
+        shutil.copytree(ui_src, version_dir / "ui-dist", dirs_exist_ok=True)
+        print("Copied ui-dist/", flush=True)
     else:
-        cursor.execute(
-            "INSERT INTO _deployment_log (filename, checksum) VALUES (%s, %s);",
-            (filename, checksum),
-        )
+        print("WARNING: ui-dist not found in build output", flush=True)
 
 
-def _ensure_admin(config: dict[str, str]) -> None:
-    """Ensure master admin user exists."""
-    schema_name = f"{PROJECT_NAME}-{config['DB_SCHEMA_SUFFIX']}"
-    ensure_sql = DEPLOY_DIR / "mcc" / "ensure_admin.sql"
-    if not ensure_sql.exists():
-        ensure_sql = DEPLOY_DIR / "db" / "schema" / "ensure_admin.sql"
-    if not ensure_sql.exists():
-        print("WARNING: ensure_admin.sql not found, skipping admin user setup")
-        return
+def sync_virtual_environment(cwd: Path, deployment_path: Path) -> None:
+    """Copy pyproject.toml and uv.lock to deployment path and sync venv."""
+    shutil.copy2(cwd / "pyproject.toml", deployment_path / "pyproject.toml")
+    shutil.copy2(cwd / "uv.lock", deployment_path / "uv.lock")
+    print("Copied pyproject.toml and uv.lock to deployment path", flush=True)
 
-    conn = _connect_db(config)
-    try:
-        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-        cursor = conn.cursor()
-        cursor.execute(f'SET search_path = "{schema_name}";')
-        cursor.execute(ensure_sql.read_text())
-        cursor.close()
-        print("Admin user ensured.")
-    except psycopg2.Error as e:
-        print(f"Error ensuring admin: {e}")
-        sys.exit(1)
-    finally:
-        conn.close()
+    print("Syncing virtual environment...", flush=True)
+    run(["uv", "sync", "--frozen"], cwd=deployment_path)
+    print("Virtual environment synchronized", flush=True)
 
 
-def _update_symlinks(config: dict[str, str], vrs_dir: Path) -> None:
-    """Update current-api and current-ui symlinks."""
-    base = Path(config["REMOTE_BASE"])
+def update_symlinks(
+    deployment_path: Path,
+    api_version_dir: Path,
+    ui_version_dir: Path,
+) -> None:
+    """Update symlinks to point to new version directories."""
+    api_link = deployment_path / "current-api"
+    if api_link.exists() or api_link.is_symlink():
+        api_link.unlink()
+    api_link.symlink_to(api_version_dir)
+    print(f"Updated symlink: current-api -> {api_version_dir}", flush=True)
 
-    api_link = base / "current-api"
-    ui_link = base / "current-ui"
-
-    api_target = vrs_dir / "src"
-    ui_target = vrs_dir / "ui-dist"
-
-    for link, target in [(api_link, api_target), (ui_link, ui_target)]:
-        if link.is_symlink() or link.exists():
-            link.unlink()
-        link.symlink_to(target)
-        print(f"Symlink: {link} -> {target}")
+    ui_link = deployment_path / "current-ui"
+    if ui_link.exists() or ui_link.is_symlink():
+        ui_link.unlink()
+    ui_link.symlink_to(ui_version_dir)
+    print(f"Updated symlink: current-ui -> {ui_version_dir}", flush=True)
 
 
-def _deploy_cron_jobs(config: dict[str, str]) -> None:
-    """Deploy cron jobs for prod stage only."""
-    cron_jobs = config.get("CRON_JOBS", "").strip()
+def setup_database(cwd: Path, conf: dict) -> None:
+    """Create schema, apply migrations, and ensure admin user.
+
+    Uses setup_db.py which is included in the build output.
+    Sets DB environment variables from the stage config.
+    """
+    schema_suffix = conf["DB_SCHEMA_SUFFIX"]
+    print(f"\nSetting up database for schema suffix: {schema_suffix}", flush=True)
+
+    # Set DB environment for setup_db.py
+    db_env = os.environ.copy()
+    db_env["DB_HOST"] = conf["DB_HOST"]
+    db_env["DB_PORT"] = str(conf["DB_PORT"])
+    db_env["DB_USER"] = conf["DB_USER"]
+    db_env["DB_PASSWORD"] = conf["DB_PASSWORD"]
+    db_env["DB_NAME"] = conf.get("DB_NAME", "postgres")
+
+    setup_db = cwd / "setup_db.py"
+
+    # Create schema and tables
+    print("Creating schema (if not exists)...", flush=True)
+    run(
+        ["uv", "run", "python", str(setup_db), "create", schema_suffix],
+        env=db_env,
+    )
+
+    # Apply pending migrations
+    print("Applying pending migrations...", flush=True)
+    run(
+        ["uv", "run", "python", str(setup_db), "update", schema_suffix],
+        env=db_env,
+    )
+
+    print("Database setup complete.", flush=True)
+
+
+def deploy_cron_jobs(conf: dict) -> None:
+    """Deploy cron jobs using marker-based crontab management."""
+    cron_jobs_raw = conf.get("CRON_JOBS", "")
+    if isinstance(cron_jobs_raw, str):
+        cron_jobs = cron_jobs_raw.strip()
+    else:
+        cron_jobs = ""
+
     if not cron_jobs:
-        print("No crong jobs")
+        print("No cron jobs to deploy", flush=True)
         return
 
-    print("Deploying cron jobs...")
-    # Read existing crontab, filter out our marker lines
+    print("Deploying cron jobs...", flush=True)
+
+    # Read existing crontab
     result = subprocess.run(
         ["crontab", "-l"], capture_output=True, text=True, check=False
     )
@@ -230,30 +174,84 @@ def _deploy_cron_jobs(config: dict[str, str]) -> None:
             lines.append(f"{job}  # {CRON_MARKER}")
 
     new_crontab = "\n".join(lines) + "\n"
+
+    print("Crontab before:", flush=True)
+    run(["bash", "-c", "crontab -l 2>/dev/null || echo '(no crontab)'"])
+
     subprocess.run(["crontab", "-"], input=new_crontab, text=True, check=True)
-    print("Cron jobs deployed.")
+
+    print("Crontab after:", flush=True)
+    run(["crontab", "-l"])
+    print("Cron jobs deployed.", flush=True)
 
 
-def _set_permissions(config: dict[str, str]) -> None:
-    """Set file permissions for www-data access."""
-    base = Path(config["REMOTE_BASE"])
-    run(["chmod", "-R", "g+rw", str(base)])
-    run(["chown", "-R", "www-data:stenvala", str(base)], check=False)
+def deploy_backup_script(cwd: Path, deployment_path: Path) -> None:
+    """Copy backup_db.py to deployment path."""
+    backup_script = cwd / "backup_db.py"
+    if backup_script.exists():
+        shutil.copy2(backup_script, deployment_path / "backup_db.py")
+        print("Deployed backup_db.py", flush=True)
 
 
-def _restart_service(config: dict[str, str]) -> None:
-    """Restart the systemd service."""
-    service = config["SERVICE_NAME"]
-    print(f"Restarting {service}...")
-    run(["sudo", "/bin/systemctl", "restart", service])
+def setup_permissions(
+    deployment_path: Path,
+    dir_user: str,
+    dir_group: str,
+) -> None:
+    """Set up proper file permissions."""
+    print("Setting up permissions...", flush=True)
+
+    # Python executable permissions
+    venv_python = deployment_path / ".venv" / "bin" / "python"
+    if venv_python.is_symlink():
+        python_path = venv_python.resolve()
+        python_dir = str(python_path.parent)
+        run(["sudo", "chmod", "-R", "o+rx", python_dir + "/"])
+
+    run(["sudo", "chmod", "o+x", str(deployment_path.parent) + "/"])
+    run(["sudo", "chmod", "o+x", str(deployment_path) + "/"])
+
+    # Deployment directory
+    run(["sudo", "chown", "-R", f"{dir_user}:{dir_group}", str(deployment_path)])
+    run(["sudo", "chmod", "-R", "g+rw", str(deployment_path)])
+
+    # Logs directory
+    logs_dir = deployment_path / "logs"
+    logs_dir.mkdir(parents=True, exist_ok=True)
+    run(["sudo", "chown", f"{dir_user}:{dir_group}", str(logs_dir)])
+    run(["sudo", "chmod", "g+rw", str(logs_dir)])
+
+    # Backup directory
+    backup_dir = deployment_path / "backup"
+    backup_dir.mkdir(parents=True, exist_ok=True)
+    run(["sudo", "chown", f"{dir_user}:{dir_group}", str(backup_dir)])
+    run(["sudo", "chmod", "750", str(backup_dir)])
+
+    # Virtual environment permissions
+    venv_dir = deployment_path / ".venv"
+    if venv_dir.exists():
+        run(["sudo", "chown", "-R", f"{dir_user}:{dir_group}", str(venv_dir)])
+        run(["sudo", "chmod", "-R", "g+rw", str(venv_dir)])
+        run(["sudo", "chmod", "-R", "g+rx", str(venv_dir / "bin")])
 
 
-def _smoke_test(config: dict[str, str]) -> None:
+def restart_service(service_name: str) -> None:
+    """Restart the systemd service and verify it started."""
+    print(f"Restarting service {service_name}...", flush=True)
+    run(["sudo", "/bin/systemctl", "restart", service_name])
+
+    print("Waiting 5 seconds for service to start...", flush=True)
+    time.sleep(5)
+    run(["sudo", "/bin/systemctl", "status", service_name])
+
+
+def smoke_test(conf: dict) -> None:
     """Run health check against the deployed service."""
-    port = config["API_PORT"]
+    port = conf["API_PORT"]
+    domain = conf.get("DOMAIN", "")
     url = f"http://127.0.0.1:{port}/api/health"
-    print(f"Smoke test: {url}")
 
+    print(f"Smoke test: {url}", flush=True)
     max_retries = 10
     for i in range(max_retries):
         try:
@@ -265,67 +263,47 @@ def _smoke_test(config: dict[str, str]) -> None:
                 timeout=5,
             )
             if result.returncode == 0:
-                print(f"Health check passed: {result.stdout.strip()}")
+                print(
+                    f"Health check passed: {result.stdout.strip()}", flush=True
+                )
                 return
         except subprocess.TimeoutExpired:
             pass
         if i < max_retries - 1:
+            print(f"  Retry {i + 1}/{max_retries}...", flush=True)
             time.sleep(2)
 
-    print("WARNING: Health check failed after retries")
-    sys.exit(1)
+    raise RuntimeError(f"Health check failed after {max_retries} retries: {url}")
 
 
-def _cleanup_old_versions(config: dict[str, str], keep: int = 5) -> None:
-    """Remove old version directories, keeping the most recent N."""
-    base = Path(config["REMOTE_BASE"])
-    versions = sorted(base.glob("vrs-*"), key=lambda p: p.name)
-    to_remove = versions[:-keep] if len(versions) > keep else []
-    for v in to_remove:
-        print(f"Removing old version: {v.name}")
-        shutil.rmtree(v)
+def clone_prod_to_dev(prod_conf: dict, dev_conf: dict) -> None:
+    """Clone prod schema data to dev schema via PostgreSQL.
 
+    Drops and recreates the dev schema, copies all tables, data,
+    and sequences from prod. Restarts the dev service after.
+    """
+    import psycopg2
+    import psycopg2.extensions
+    from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
-def _deploy_stage(config: dict[str, str]) -> None:
-    """Execute full deployment for a stage."""
-    stage = config["STAGE"]
-    print(f"\n{'=' * 40}")
-    print(f"DEPLOYING: {stage}")
-    print(f"{'=' * 40}")
+    prod_schema = f"{PROJECT_NAME}-{prod_conf['DB_SCHEMA_SUFFIX']}"
+    dev_schema = f"{PROJECT_NAME}-{dev_conf['DB_SCHEMA_SUFFIX']}"
+    dev_service = dev_conf.get("SERVICE_NAME", "ana-auth-dev.service")
 
-    # Ensure logs directory
-    logs_dir = Path(config["REMOTE_BASE"]) / "logs"
-    logs_dir.mkdir(parents=True, exist_ok=True)
+    print(f"\nCloning {prod_schema} -> {dev_schema}", flush=True)
 
-    vrs_dir = _create_versioned_dir(config)
-    _deploy_files(vrs_dir)
-    _sync_venv(config)
-    _setup_database(config)
-    _ensure_admin(config)
-    _update_symlinks(config, vrs_dir)
+    # Stop dev service
+    print(f"Stopping {dev_service}...", flush=True)
+    run(["sudo", "/bin/systemctl", "stop", dev_service])
+    time.sleep(5)
 
-    if stage == "prod":
-        _deploy_cron_jobs(config)
-
-    _set_permissions(config)
-    _restart_service(config)
-    _smoke_test(config)
-    _cleanup_old_versions(config)
-
-    print(f"\nDeployment to {stage} complete.")
-
-
-def _clone_prod_to_dev() -> None:
-    """Copy prod schema data to dev schema."""
-    prod_config = _get_config("prod")
-    dev_config = _get_config("dev")
-
-    prod_schema = f"{PROJECT_NAME}-{prod_config['DB_SCHEMA_SUFFIX']}"
-    dev_schema = f"{PROJECT_NAME}-{dev_config['DB_SCHEMA_SUFFIX']}"
-
-    print(f"\nCloning {prod_schema} -> {dev_schema}")
-
-    conn = _connect_db(prod_config)
+    conn = psycopg2.connect(
+        host=prod_conf["DB_HOST"],
+        port=int(prod_conf["DB_PORT"]),
+        database=prod_conf.get("DB_NAME", "postgres"),
+        user=prod_conf["DB_USER"],
+        password=prod_conf["DB_PASSWORD"],
+    )
     try:
         conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cursor = conn.cursor()
@@ -342,52 +320,144 @@ def _clone_prod_to_dev() -> None:
         tables = [row[0] for row in cursor.fetchall()]
 
         for table in tables:
-            # Create table structure
             cursor.execute(
-                f'CREATE TABLE "{dev_schema}"."{table}" (LIKE "{prod_schema}"."{table}" INCLUDING ALL);'
+                f'CREATE TABLE "{dev_schema}"."{table}" '
+                f'(LIKE "{prod_schema}"."{table}" INCLUDING ALL);'
             )
-            # Copy data
             cursor.execute(
-                f'INSERT INTO "{dev_schema}"."{table}" SELECT * FROM "{prod_schema}"."{table}";'
+                f'INSERT INTO "{dev_schema}"."{table}" '
+                f'SELECT * FROM "{prod_schema}"."{table}";'
             )
-            print(f"  Copied table: {table}")
+            print(f"  Copied table: {table}", flush=True)
 
         # Copy sequences
         cursor.execute(
-            "SELECT sequence_name FROM information_schema.sequences WHERE sequence_schema = %s;",
+            "SELECT sequence_name FROM information_schema.sequences "
+            "WHERE sequence_schema = %s;",
             (prod_schema,),
         )
         for (seq_name,) in cursor.fetchall():
-            cursor.execute(f'SELECT last_value FROM "{prod_schema}"."{seq_name}";')
+            cursor.execute(
+                f'SELECT last_value FROM "{prod_schema}"."{seq_name}";'
+            )
             last_val = cursor.fetchone()[0]
             cursor.execute(
-                f'SELECT setval(\'"{dev_schema}"."{seq_name}"\', %s);',
+                f"SELECT setval('\"{dev_schema}\".\"{seq_name}\"', %s);",
                 (last_val,),
             )
 
         cursor.close()
-        print(f"\nClone complete: {prod_schema} -> {dev_schema}")
+        print(f"\nClone complete: {prod_schema} -> {dev_schema}", flush=True)
     except psycopg2.Error as e:
-        print(f"Clone error: {e}")
+        print(f"Clone error: {e}", flush=True)
         sys.exit(1)
     finally:
         conn.close()
 
+    # Start dev service
+    print(f"Starting {dev_service}...", flush=True)
+    run(["sudo", "/bin/systemctl", "start", dev_service])
+    time.sleep(5)
+    run(["sudo", "/bin/systemctl", "status", dev_service])
 
-@app.command()
-def deploy(
+
+def deploy(keep_versions: int, conf: dict) -> None:
+    """Core deployment logic."""
+    cwd = Path.cwd()
+    stage = conf.get("STAGE", "unknown")
+    deployment_path = Path(conf["REMOTE_BASE"])
+    service_name = conf.get("SERVICE_NAME", "ana-auth.service")
+    dir_user = conf.get("DIR_USER", "www-data")
+    dir_group = conf.get("DIR_GROUP", "stenvala")
+
+    deployment_path.mkdir(parents=True, exist_ok=True)
+
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M%S")
+    version_name = f"vrs-{timestamp}"
+    version_dir = deployment_path / version_name
+
+    print(f"Deploying version {version_name} to {deployment_path}...", flush=True)
+
+    # Log build info if available
+    build_info_path = cwd / "build_info.yml"
+    if build_info_path.exists():
+        info = yaml.safe_load(build_info_path.read_text())
+        print(
+            f"Deploying build from {info.get('git_branch', '?')} "
+            f"@ {info.get('git_commit', '?')[:8]}",
+            flush=True,
+        )
+
+    # Copy files to version directory
+    version_dir.mkdir(parents=True)
+    copy_api_files(cwd, version_dir)
+    copy_ui_files(cwd, version_dir)
+
+    # Sync virtual environment
+    sync_virtual_environment(cwd, deployment_path)
+
+    # Update symlinks
+    update_symlinks(deployment_path, version_dir, version_dir)
+
+    # Database operations
+    setup_database(cwd, conf)
+
+    # Deploy backup script
+    deploy_backup_script(cwd, deployment_path)
+
+    # Deploy cron jobs (prod only)
+    if stage == "prod":
+        deploy_cron_jobs(conf)
+
+    # Permissions and cleanup
+    setup_permissions(deployment_path, dir_user, dir_group)
+    cleanup_old_versions(deployment_path, keep_versions)
+
+    # Restart service
+    restart_service(service_name)
+
+    print(f"Deployment succeeded: {version_name}", flush=True)
+
+    # Smoke tests
+    smoke_test(conf)
+
+
+def main(
     stage: str = typer.Option(
-        ..., "--stage", help="Deployment stage (prod, dev, clone-prod-to-dev)"
+        ..., help="Deployment stage (prod, dev, clone-prod-to-dev, etc.)"
     ),
 ) -> None:
-    """Deploy ana-auth to the specified stage."""
-    if stage == "clone-prod-to-dev":
-        _clone_prod_to_dev()
-        return
+    """CLI entry point. Reads mcc_config.yml for stage parameters and the correct conf file."""
+    try:
+        cwd = Path.cwd()
+        config_path = Path("mcc_config.yml")
+        config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+        stage_config = config["deploy"][stage]
+        params = stage_config.get("parameters", {})
 
-    config = _get_config(stage)
-    _deploy_stage(config)
+        if stage == "clone-prod-to-dev":
+            prod_conf = load_conf(cwd / "mcc", params.get("conf-source", "conf-prod.yml"))
+            dev_conf = load_conf(cwd / "mcc", params.get("conf-target", "conf-dev.yml"))
+            clone_prod_to_dev(prod_conf, dev_conf)
+            return
+
+        conf_file = params.get("conf", "conf.yml")
+        conf = load_conf(cwd / "mcc", conf_file)
+        keep_versions = params.get("keep_builds", 10)
+
+        deploy(keep_versions, conf)
+
+    except Exception as e:
+        print(f"Deployment failed: {e}", file=sys.stderr)
+        import traceback
+
+        traceback.print_exc(file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
+    print("Starting deployment", flush=True)
+    app = typer.Typer()
+    app.command()(main)
     app()
+    print("Finished deployment", flush=True)

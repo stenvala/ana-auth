@@ -2,8 +2,11 @@ STAGE: dev
 REMOTE_USER: stenvala
 REMOTE_HOST: mathcodingclub.com
 REMOTE_BASE: /home/stenvala/live/auth-dev
+DIR_USER: www-data
+DIR_GROUP: stenvala
 SERVICE_NAME: ana-auth-dev.service
 DOMAIN: auth-dev.mathcodingclub.com
+EMAIL: antti@stenvall.fi
 DB_HOST: PLACEHOLDER_DB_HOST
 DB_PORT: "5432"
 DB_USER: PLACEHOLDER_DB_USER
