@@ -119,6 +119,7 @@ def assemble_output() -> None:
         "mcc_deploy.py",
         "mcc_common.py",
         "mcc_config.py",
+        "mcc_config.yml",
         "setup_db.py",
         "backup_db.py",
         "pyproject.toml",
