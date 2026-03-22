@@ -38,7 +38,7 @@ PYTEST_CONFIGS = {
     "integration": PytestConfig(
         marker="integration",
         parallel=False,
-        junit_xml="integation-tests.xml",
+        junit_xml="integration-tests.xml",
         cov_fail_under=None,
         suite_name="Python Integration Tests",
     ),
@@ -156,16 +156,33 @@ class TestRunner:
     def run_ruff_check(self) -> bool:
         return self._run_tracked(
             "Ruff",
-            ["uv", "run", "ruff", "check", ".", "--exclude", "ui"],
+            [
+                "uv", "run", "ruff", "check", ".", "--exclude", "ui",
+                "--output-format=junit", "--output-file", str(self.project_root / "ruff.xml"),
+            ],
             cwd=self.src_dir,
         )
 
     def run_ty_check(self) -> bool:
-        return self._run_tracked(
+        success = self._run_tracked(
             "ty",
             ["uv", "run", "ty", "check"],
             cwd=self.src_dir,
         )
+        # Generate JUnit XML artifact separately (ty has no --output-file)
+        try:
+            result = subprocess.run(
+                ["uv", "run", "ty", "check", "--output-format", "junit"],
+                cwd=self.src_dir,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            ty_xml = self.project_root / "ty.xml"
+            ty_xml.write_text(result.stdout)
+        except Exception:
+            pass
+        return success
 
     def run_cyclomatic_complexity(self, max_complexity: int = 10) -> bool:
         return self._run_tracked(
@@ -222,6 +239,7 @@ class TestRunner:
                 "--cov=.",
                 "--cov-config=../pyproject.toml",
                 "--cov-report=html:../htmlcov",
+                "--cov-report=json:../coverage.json",
                 "--cov-report=term-missing",
                 "--cov-branch",
             ]

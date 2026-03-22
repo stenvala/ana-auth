@@ -47,6 +47,8 @@ def run_quality_checks() -> None:
     """Run ruff and ty quality checks."""
     print("\n=== QUALITY CHECKS ===")
     run(["uv", "run", "run_tests.py", "quality"])
+    _copy_artifact("ruff.xml")
+    _copy_artifact("ty.xml")
 
 
 def run_unit_tests() -> None:
@@ -62,8 +64,8 @@ def run_unit_tests() -> None:
         ]
     )
     # Copy test artifacts
-    for artifact in PROJECT_ROOT.glob("pytest-*.xml"):
-        shutil.copy2(artifact, TEST_ARTIFACTS_DIR)
+    _copy_artifact("unit-tests.xml")
+    _copy_artifact("coverage.json")
     htmlcov = PROJECT_ROOT / "htmlcov"
     if htmlcov.exists():
         shutil.copytree(htmlcov, TEST_ARTIFACTS_DIR / "htmlcov", dirs_exist_ok=True)
@@ -73,8 +75,14 @@ def run_integration_tests() -> None:
     """Run integration tests."""
     print("\n=== INTEGRATION TESTS ===")
     run(["uv", "run", "run_tests.py", "int"])
-    for artifact in PROJECT_ROOT.glob("integation-*.xml"):
-        shutil.copy2(artifact, TEST_ARTIFACTS_DIR)
+    _copy_artifact("integration-tests.xml")
+
+
+def _copy_artifact(name: str) -> None:
+    """Copy a single artifact file to the test artifacts directory if it exists."""
+    src = PROJECT_ROOT / name
+    if src.exists():
+        shutil.copy2(src, TEST_ARTIFACTS_DIR / name)
 
 
 def build_frontend() -> None:
