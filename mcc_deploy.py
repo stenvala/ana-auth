@@ -30,44 +30,14 @@ CRON_MARKER = "MCC-AUTH"
 
 
 def load_conf(cwd: Path, conf_file: str = "conf.yml") -> dict:
-    """Load deployment configuration from the given conf file.
-
-    Loads the conf file from the build output, then overrides any PLACEHOLDER_*
-    values with real values from the server-side conf at REMOTE_BASE/mcc/.
-    """
+    """Load deployment configuration from the given conf file."""
     conf_path = cwd / conf_file
     if not conf_path.exists():
         raise FileNotFoundError(f"{conf_file} not found in {cwd}")
     raw = yaml.safe_load(conf_path.read_text())
 
-    # Override PLACEHOLDER values from server-side conf file
-    remote_base = raw.get("REMOTE_BASE", "")
-    if remote_base:
-        server_conf_path = Path(remote_base) / "mcc" / conf_file
-        if server_conf_path.exists():
-            server_raw = yaml.safe_load(server_conf_path.read_text())
-            for key, value in raw.items():
-                if (
-                    isinstance(value, str)
-                    and value.startswith("PLACEHOLDER_")
-                    and key in server_raw
-                ):
-                    raw[key] = server_raw[key]
-
-    # Check for unresolved placeholders
-    unresolved = [
-        (k, v) for k, v in raw.items()
-        if isinstance(v, str) and v.startswith("PLACEHOLDER_")
-    ]
-    if unresolved:
-        keys = ", ".join(k for k, _ in unresolved)
-        server_path = Path(remote_base) / "mcc" / conf_file if remote_base else "unknown"
-        raise RuntimeError(
-            f"Unresolved placeholder values for: {keys}. "
-            f"Create {server_path} on the server with real values."
-        )
-
     # Resolve {{REMOTE_BASE}} templates
+    remote_base = raw.get("REMOTE_BASE", "")
     resolved = {}
     for key, value in raw.items():
         if isinstance(value, str):

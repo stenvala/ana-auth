@@ -7,10 +7,10 @@ DIR_GROUP: stenvala
 SERVICE_NAME: ana-auth.service
 DOMAIN: auth.mathcodingclub.com
 EMAIL: antti@stenvall.fi
-DB_HOST: PLACEHOLDER_DB_HOST
+DB_HOST: localhost
 DB_PORT: "5432"
-DB_USER: PLACEHOLDER_DB_USER
-DB_PASSWORD: PLACEHOLDER_DB_PASSWORD
+DB_USER: postgres
+DB_PASSWORD: postgres
 DB_NAME: postgres
 DB_SCHEMA_SUFFIX: main
 API_PORT: "6784"
