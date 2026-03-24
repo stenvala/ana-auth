@@ -208,8 +208,12 @@ def setup_permissions(
         python_dir = str(python_path.parent)
         run(["sudo", "chmod", "-R", "o+rx", python_dir + "/"])
 
-    run(["sudo", "chmod", "o+x", str(deployment_path.parent) + "/"])
-    run(["sudo", "chmod", "o+x", str(deployment_path) + "/"])
+    # Ensure www-data can traverse the full path to deployment
+    for parent in reversed(deployment_path.parents):
+        if parent == Path("/"):
+            continue
+        run(["sudo", "chmod", "o+x", str(parent)])
+    run(["sudo", "chmod", "o+x", str(deployment_path)])
 
     # Versions directory (www-data needs to read API/UI files)
     versions_dir = deployment_path / "versions"
@@ -246,34 +250,40 @@ def restart_service(service_name: str) -> None:
 
 
 def smoke_test(conf: dict) -> None:
-    """Run health check against the deployed service."""
+    """Run health checks against the deployed service (local port and public domain)."""
     port = conf["API_PORT"]
     domain = conf.get("DOMAIN", "")
-    url = f"http://127.0.0.1:{port}/api/health"
+    urls = [
+        f"http://127.0.0.1:{port}/api/health",
+        f"https://{domain}/api/health",
+    ]
 
-    print(f"Smoke test: {url}", flush=True)
-    max_retries = 10
-    for i in range(max_retries):
-        try:
-            result = subprocess.run(
-                ["curl", "-sf", url],
-                capture_output=True,
-                text=True,
-                check=False,
-                timeout=5,
-            )
-            if result.returncode == 0:
-                print(
-                    f"Health check passed: {result.stdout.strip()}", flush=True
+    for url in urls:
+        print(f"Smoke test: {url}", flush=True)
+        max_retries = 10
+        for i in range(max_retries):
+            try:
+                result = subprocess.run(
+                    ["curl", "-sf", url],
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                    timeout=5,
                 )
-                return
-        except subprocess.TimeoutExpired:
-            pass
-        if i < max_retries - 1:
-            print(f"  Retry {i + 1}/{max_retries}...", flush=True)
-            time.sleep(2)
-
-    raise RuntimeError(f"Health check failed after {max_retries} retries: {url}")
+                if result.returncode == 0:
+                    print(
+                        f"Health check passed: {result.stdout.strip()}", flush=True
+                    )
+                    break
+            except subprocess.TimeoutExpired:
+                pass
+            if i < max_retries - 1:
+                print(f"  Retry {i + 1}/{max_retries}...", flush=True)
+                time.sleep(2)
+        else:
+            raise RuntimeError(
+                f"Health check failed after {max_retries} retries: {url}"
+            )
 
 
 def clone_prod_to_dev(prod_conf: dict, dev_conf: dict) -> None:
