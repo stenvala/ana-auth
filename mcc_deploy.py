@@ -209,11 +209,14 @@ def setup_permissions(
         run(["sudo", "chmod", "-R", "o+rx", python_dir + "/"])
 
     # Ensure www-data can traverse the full path to deployment
-    for parent in reversed(deployment_path.parents):
-        if parent == Path("/"):
-            continue
-        run(["sudo", "chmod", "o+x", str(parent)])
-    run(["sudo", "chmod", "o+x", str(deployment_path)])
+    # Use resolved path in case of symlinks (e.g. live -> Dropbox/...)
+    resolved_path = deployment_path.resolve()
+    for path in [deployment_path, resolved_path]:
+        for parent in reversed(path.parents):
+            if parent == Path("/"):
+                continue
+            run(["sudo", "chmod", "o+x", str(parent)])
+        run(["sudo", "chmod", "o+x", str(path)])
 
     # Versions directory (www-data needs to read API/UI files)
     versions_dir = deployment_path / "versions"
