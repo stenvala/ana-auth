@@ -4,7 +4,6 @@ After=network.target
 
 [Service]
 User=www-data
-Group=stenvala
 WorkingDirectory={{API_SYMLINK}}
 ExecStart={{REMOTE_BASE}}/.venv/bin/gunicorn api.main:app \
     --workers {{WORKERS}} \

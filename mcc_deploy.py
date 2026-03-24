@@ -80,8 +80,8 @@ def copy_ui_files(cwd: Path, version_dir: Path) -> None:
 
 def sync_virtual_environment(cwd: Path, deployment_path: Path) -> None:
     """Copy pyproject.toml and uv.lock to deployment path and sync venv."""
-    shutil.copyfile(cwd / "pyproject.toml", deployment_path / "pyproject.toml")
-    shutil.copyfile(cwd / "uv.lock", deployment_path / "uv.lock")
+    shutil.copy2(cwd / "pyproject.toml", deployment_path / "pyproject.toml")
+    shutil.copy2(cwd / "uv.lock", deployment_path / "uv.lock")
     print("Copied pyproject.toml and uv.lock to deployment path", flush=True)
 
     print("Syncing virtual environment...", flush=True)
@@ -189,7 +189,7 @@ def deploy_backup_script(cwd: Path, deployment_path: Path) -> None:
     """Copy backup_db.py to deployment path."""
     backup_script = cwd / "backup_db.py"
     if backup_script.exists():
-        shutil.copyfile(backup_script, deployment_path / "backup_db.py")
+        shutil.copy2(backup_script, deployment_path / "backup_db.py")
         print("Deployed backup_db.py", flush=True)
 
 
@@ -208,38 +208,31 @@ def setup_permissions(
         python_dir = str(python_path.parent)
         run(["sudo", "chmod", "-R", "o+rx", python_dir + "/"])
 
-    # Ensure www-data can traverse the full path to deployment
-    # Use resolved path in case of symlinks (e.g. live -> Dropbox/...)
-    resolved_path = deployment_path.resolve()
-    for path in [deployment_path, resolved_path]:
-        for parent in reversed(path.parents):
-            if parent == Path("/"):
-                continue
-            run(["sudo", "chmod", "o+x", str(parent)])
-        run(["sudo", "chmod", "o+x", str(path)])
+    run(["sudo", "chmod", "o+x", str(deployment_path.parent) + "/"])
+    run(["sudo", "chmod", "o+x", str(deployment_path) + "/"])
 
-    # Versions directory (www-data needs to read API/UI files)
-    versions_dir = deployment_path / "versions"
-    if versions_dir.exists():
-        run(["sudo", "chown", "-R", f"{dir_user}:{dir_group}", str(versions_dir)])
-        run(["sudo", "chmod", "-R", "g+rw", str(versions_dir)])
+    # Deployment directory
+    run(["sudo", "chown", "-R", f"{dir_user}:{dir_group}", str(deployment_path)])
+    run(["sudo", "chmod", "-R", "g+rw", str(deployment_path)])
 
     # Logs directory
     logs_dir = deployment_path / "logs"
     logs_dir.mkdir(parents=True, exist_ok=True)
-    run(["sudo", "chown", "-R", f"{dir_user}:{dir_group}", str(logs_dir)])
+    run(["sudo", "chown", f"{dir_user}:{dir_group}", str(logs_dir)])
     run(["sudo", "chmod", "g+rw", str(logs_dir)])
 
-    # Backup directory (owned by deployer user, not www-data)
+    # Backup directory
     backup_dir = deployment_path / "backup"
     backup_dir.mkdir(parents=True, exist_ok=True)
+    run(["sudo", "chown", f"{dir_user}:{dir_group}", str(backup_dir)])
+    run(["sudo", "chmod", "750", str(backup_dir)])
 
     # Virtual environment permissions
     venv_dir = deployment_path / ".venv"
     if venv_dir.exists():
         run(["sudo", "chown", "-R", f"{dir_user}:{dir_group}", str(venv_dir)])
         run(["sudo", "chmod", "-R", "g+rw", str(venv_dir)])
-        run(["sudo", "chmod", "-R", "u+rx,g+rx", str(venv_dir / "bin")])
+        run(["sudo", "chmod", "-R", "g+rx", str(venv_dir / "bin")])
 
 
 def restart_service(service_name: str) -> None:
