@@ -28,15 +28,24 @@ class ServiceOrchestrator:
 
     def kill_port(self, port: int) -> None:
         """Kill any process listening on the given port."""
-        for conn in psutil.net_connections(kind="inet"):
-            if conn.laddr.port == port and conn.pid:
-                try:
-                    proc = psutil.Process(conn.pid)
-                    print(f"Killing process {conn.pid} ({proc.name()}) on port {port}")
-                    proc.terminate()
-                    proc.wait(timeout=5)
-                except (psutil.NoSuchProcess, psutil.TimeoutExpired):
-                    pass
+        try:
+            result = subprocess.run(
+                ["lsof", "-ti", f":{port}"],
+                capture_output=True,
+                text=True,
+            )
+            if result.stdout.strip():
+                for pid_str in result.stdout.strip().split("\n"):
+                    pid = int(pid_str)
+                    try:
+                        proc = psutil.Process(pid)
+                        print(f"Killing process {pid} ({proc.name()}) on port {port}")
+                        proc.terminate()
+                        proc.wait(timeout=5)
+                    except (psutil.NoSuchProcess, psutil.TimeoutExpired):
+                        pass
+        except FileNotFoundError:
+            pass
 
     def start_api(self) -> subprocess.Popen:
         """Start the FastAPI backend with uvicorn."""

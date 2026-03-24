@@ -211,21 +211,21 @@ def setup_permissions(
     run(["sudo", "chmod", "o+x", str(deployment_path.parent) + "/"])
     run(["sudo", "chmod", "o+x", str(deployment_path) + "/"])
 
-    # Deployment directory
-    run(["sudo", "chown", "-R", f"{dir_user}:{dir_group}", str(deployment_path)])
-    run(["sudo", "chmod", "-R", "g+rw", str(deployment_path)])
+    # Versions directory (www-data needs to read API/UI files)
+    versions_dir = deployment_path / "versions"
+    if versions_dir.exists():
+        run(["sudo", "chown", "-R", f"{dir_user}:{dir_group}", str(versions_dir)])
+        run(["sudo", "chmod", "-R", "g+rw", str(versions_dir)])
 
     # Logs directory
     logs_dir = deployment_path / "logs"
     logs_dir.mkdir(parents=True, exist_ok=True)
-    run(["sudo", "chown", f"{dir_user}:{dir_group}", str(logs_dir)])
+    run(["sudo", "chown", "-R", f"{dir_user}:{dir_group}", str(logs_dir)])
     run(["sudo", "chmod", "g+rw", str(logs_dir)])
 
-    # Backup directory
+    # Backup directory (owned by deployer user, not www-data)
     backup_dir = deployment_path / "backup"
     backup_dir.mkdir(parents=True, exist_ok=True)
-    run(["sudo", "chown", f"{dir_user}:{dir_group}", str(backup_dir)])
-    run(["sudo", "chmod", "750", str(backup_dir)])
 
     # Virtual environment permissions
     venv_dir = deployment_path / ".venv"
