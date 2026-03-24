@@ -80,8 +80,8 @@ def copy_ui_files(cwd: Path, version_dir: Path) -> None:
 
 def sync_virtual_environment(cwd: Path, deployment_path: Path) -> None:
     """Copy pyproject.toml and uv.lock to deployment path and sync venv."""
-    shutil.copy(cwd / "pyproject.toml", deployment_path / "pyproject.toml")
-    shutil.copy(cwd / "uv.lock", deployment_path / "uv.lock")
+    shutil.copyfile(cwd / "pyproject.toml", deployment_path / "pyproject.toml")
+    shutil.copyfile(cwd / "uv.lock", deployment_path / "uv.lock")
     print("Copied pyproject.toml and uv.lock to deployment path", flush=True)
 
     print("Syncing virtual environment...", flush=True)
