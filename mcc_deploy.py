@@ -252,6 +252,7 @@ def smoke_test(conf: dict) -> None:
     urls = [
         f"http://127.0.0.1:{port}/api/health",
         f"https://{domain}/api/health",
+        f"https://{domain}/",
     ]
 
     for url in urls:
