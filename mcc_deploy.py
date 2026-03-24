@@ -80,8 +80,8 @@ def copy_ui_files(cwd: Path, version_dir: Path) -> None:
 
 def sync_virtual_environment(cwd: Path, deployment_path: Path) -> None:
     """Copy pyproject.toml and uv.lock to deployment path and sync venv."""
-    shutil.copy2(cwd / "pyproject.toml", deployment_path / "pyproject.toml")
-    shutil.copy2(cwd / "uv.lock", deployment_path / "uv.lock")
+    shutil.copy(cwd / "pyproject.toml", deployment_path / "pyproject.toml")
+    shutil.copy(cwd / "uv.lock", deployment_path / "uv.lock")
     print("Copied pyproject.toml and uv.lock to deployment path", flush=True)
 
     print("Syncing virtual environment...", flush=True)
@@ -371,10 +371,12 @@ def deploy(keep_versions: int, conf: dict) -> None:
     dir_group = conf.get("DIR_GROUP", "stenvala")
 
     deployment_path.mkdir(parents=True, exist_ok=True)
+    versions_path = deployment_path / "versions"
+    versions_path.mkdir(exist_ok=True)
 
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M%S")
     version_name = f"vrs-{timestamp}"
-    version_dir = deployment_path / version_name
+    version_dir = versions_path / version_name
 
     print(f"Deploying version {version_name} to {deployment_path}...", flush=True)
 
@@ -397,7 +399,7 @@ def deploy(keep_versions: int, conf: dict) -> None:
     sync_virtual_environment(cwd, deployment_path)
 
     # Update symlinks
-    update_symlinks(deployment_path, version_dir, version_dir)
+    update_symlinks(deployment_path, version_dir, version_dir / "ui-dist")
 
     # Database operations
     setup_database(cwd, conf)
@@ -411,7 +413,7 @@ def deploy(keep_versions: int, conf: dict) -> None:
 
     # Permissions and cleanup
     setup_permissions(deployment_path, dir_user, dir_group)
-    cleanup_old_versions(deployment_path, keep_versions)
+    cleanup_old_versions(versions_path, keep_versions)
 
     # Restart service
     restart_service(service_name)

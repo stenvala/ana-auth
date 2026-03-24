@@ -40,3 +40,6 @@ test-artifacts
 output
 *-report.xml
 *-tests.xml
+
+ruff.xml
+ty.xml

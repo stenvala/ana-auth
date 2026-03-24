@@ -154,14 +154,25 @@ class TestRunner:
         return success
 
     def run_ruff_check(self) -> bool:
-        return self._run_tracked(
+        success = self._run_tracked(
             "Ruff",
-            [
-                "uv", "run", "ruff", "check", ".", "--exclude", "ui",
-                "--output-format=junit", "--output-file", str(self.project_root / "ruff.xml"),
-            ],
+            ["uv", "run", "ruff", "check", ".", "--exclude", "ui"],
             cwd=self.src_dir,
         )
+        # Generate JUnit XML artifact separately
+        try:
+            subprocess.run(
+                [
+                    "uv", "run", "ruff", "check", ".", "--exclude", "ui",
+                    "--output-format=junit", "-o", str(self.project_root / "ruff.xml"),
+                ],
+                cwd=self.src_dir,
+                capture_output=True,
+                check=False,
+            )
+        except Exception:
+            pass
+        return success
 
     def run_ty_check(self) -> bool:
         success = self._run_tracked(
