@@ -232,7 +232,7 @@ def setup_permissions(
     if venv_dir.exists():
         run(["sudo", "chown", "-R", f"{dir_user}:{dir_group}", str(venv_dir)])
         run(["sudo", "chmod", "-R", "g+rw", str(venv_dir)])
-        run(["sudo", "chmod", "-R", "g+rx", str(venv_dir / "bin")])
+        run(["sudo", "chmod", "-R", "u+rx,g+rx", str(venv_dir / "bin")])
 
 
 def restart_service(service_name: str) -> None:
